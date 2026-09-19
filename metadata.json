@@ -1,0 +1,6 @@
+{
+  "name": "Bin Riaz Grill Restaurant",
+  "description": "Authentic Charcoal & Desi Cuisine, BBQ, Karahi, and Online Food Ordering in Islamabad.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
