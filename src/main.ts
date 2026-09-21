@@ -105,16 +105,27 @@ window.clearSearch = function() {
 // Helper to sanitize items for Firebase RTDB & Firestore (no undefined values)
 function sanitizeMenuItems(items) {
   if (!Array.isArray(items)) return [];
-  return items.map((item, idx) => ({
-    id: String(item.id || ('dish-' + (Date.now() + idx))),
-    name: String(item.name || 'Special Dish'),
-    category: String(item.category || 'deals'),
-    price: Number(item.price || 0),
-    desc: String(item.desc || ''),
-    tag: String(item.tag || ''),
-    icon: String(item.icon || 'fa-utensils'),
-    image: item.image || null
-  }));
+  return items.map((item, idx) => {
+    let img = item.image || null;
+    if (typeof defaultMenuItems !== 'undefined' && Array.isArray(defaultMenuItems)) {
+      const def = defaultMenuItems.find(d => d.id === item.id);
+      if (def && def.image) {
+        if (!img || img.includes('photo-1541592106381') || img.includes('photo-1550547660') || img.includes('photo-1627308595229') || img.includes('photo-1594041680534') || img.includes('photo-1567620832903')) {
+          img = def.image;
+        }
+      }
+    }
+    return {
+      id: String(item.id || ('dish-' + (Date.now() + idx))),
+      name: String(item.name || 'Special Dish'),
+      category: String(item.category || 'deals'),
+      price: Number(item.price || 0),
+      desc: String(item.desc || ''),
+      tag: String(item.tag || ''),
+      icon: String(item.icon || 'fa-utensils'),
+      image: img
+    };
+  });
 }
 
 // Online multi-device synchronization function
@@ -153,42 +164,42 @@ window.syncMenuOnline = function(rawItems) {
 
 
         const defaultMenuItems = [
-            { id: "deal-1", name: "DEALS-1 (Jumbo Roll Special)", category: "deals", price: 500, desc: "1 Jumbo Roll Paratha + 2 Sauces + 300 ML Drink", tag: "Bestseller", icon: "fa-burger" },
-            { id: "deal-2", name: "DEALS-2 (Duo Jumbo)", category: "deals", price: 1000, desc: "2 Jumbo Roll Paratha + 2 Drinks", tag: "Popular", icon: "fa-utensils" },
-            { id: "deal-3", name: "DEALS-3 (Buy 5 Get 1 Free)", category: "deals", price: 1999, desc: "5 Roll Paratha + Get 1 Free Roll Paratha", tag: "Value Deal", icon: "fa-gift" },
-            { id: "deal-4", name: "DEALS-4 (Family Feast)", category: "deals", price: 3200, desc: "7 Roll Paratha + Get 2 Free Sauces", tag: "Family", icon: "fa-users" },
-            { id: "deal-5", name: "DEALS-5 (Mega Special)", category: "deals", price: 3999, desc: "10 Roll Paratha Special + Get 2 Jumbo Rolls Free", tag: "Mega Deal", icon: "fa-crown" },
-            { id: "desi-tarka", name: "DESI TARKA DEAL", category: "dawat", price: 1200, desc: "Tawa Chicken + 2 Sauces + 3 Malwari Paratha + 1 Special Drink", tag: "Desi Taste", icon: "fa-fire" },
-            { id: "dawat-4-5", name: "DAWAT DESI DEAL (4 to 5 Person)", category: "dawat", price: 2600, desc: "Special Chicken Karahi (Extra Gravy) + Special Boneless Biryani (Matka) + 6 Roti/Naan + 2 Sauce Dips + 1000 ML Drink", tag: "4-5 Person", icon: "fa-bowl-food" },
-            { id: "dawat-6-7", name: "DAWAT DESI DEAL (6 to 7 Person)", category: "dawat", price: 4200, desc: "Chicken Karahi Full (Extra Gravy) + Special BBQ Platter (with rice) + 8 Naan + 2 Special Sauces + Drink", tag: "Grand Feast", icon: "fa-champagne-glasses" },
-            { id: "platter-1", name: "BAR B Q PLATTER (1 Person)", category: "platters", price: 1300, desc: "Malai Boti / Chicken Boti / Behari Boti + Reshmi Kabab + Fried Rice / Malwari Paratha + Special Sauce", tag: "Solo Feast", icon: "fa-drumstick-bite" },
-            { id: "platter-2", name: "BAR B Q PLATTER (2 Person)", category: "platters", price: 2000, desc: "Malai Boti + Shangrila Boti + Chicken Boti + Behari Boti + Reshmi Kabab + Chinese Rice & 2 Malwari Paratha + Special Sauce", tag: "Duo Feast", icon: "fa-drumstick-bite" },
-            { id: "platter-3", name: "BAR B Q PLATTER (3 Person)", category: "platters", price: 3000, desc: "Malai Boti + Shangrila Boti + Behari Boti + Reshmi Kabab + Chicken Boti + Chicken Tikka + Full Chinese Rice & 3 Malwari Paratha + Special Sauce", tag: "Trio Royal", icon: "fa-drumstick-bite" },
-            { id: "roll-bin-riyaz", name: "Bin Riaz Special Roll (Jumbo)", category: "rolls", price: 450, desc: "Chef's signature charcoal chicken wrapped in freshly prepared crisp Malwari Paratha.", tag: "Must Try", icon: "fa-bread-slice" },
-            { id: "roll-chatni", name: "Chicken Chatni Roll (Jumbo)", category: "rolls", price: 450, desc: "Smoky grilled chicken spiced with authentic spicy mint chutney & onions.", tag: "Spicy", icon: "fa-pepper-hot" },
-            { id: "roll-cheese", name: "Chicken Cheese Roll (Jumbo)", category: "rolls", price: 450, desc: "Loaded with melted mozzarella and cheddar cheese over tender chicken cubes.", tag: "Cheesy", icon: "fa-cheese" },
-            { id: "roll-mayo", name: "Chicken Mayo Roll (Jumbo)", category: "rolls", price: 450, desc: "Creamy garlic mayo tossed with charcoal grilled chicken.", tag: "Kids Fav", icon: "fa-bread-slice" },
-            { id: "roll-malai", name: "Malai Boti Roll (Jumbo)", category: "rolls", price: 450, desc: "Ultra tender boneless chicken infused with mild spices & cream.", tag: "Mild", icon: "fa-bread-slice" },
-            { id: "roll-behari", name: "Behari Kabab Roll (Jumbo)", category: "rolls", price: 450, desc: "Authentic Bihari spiced tender meat roll with smoky flavor.", tag: "Smoky", icon: "fa-bread-slice" },
-            { id: "roll-cheese-paratha", name: "Cheese Paratha (Special)", category: "rolls", price: 800, desc: "Stuffed whole wheat crispy paratha bursting with premium molten cheese.", tag: "Cheese Lover", icon: "fa-circle-dot" },
-            { id: "karahi-chicken-half", name: "Chicken Karahi (Half)", category: "karahi", price: 1150, desc: "Prepared fresh on wok with fresh tomatoes, ginger, green chilies, and pure spices.", tag: "Fresh 30 Min", icon: "fa-bowl-rice" },
-            { id: "karahi-chicken-full", name: "Chicken Karahi (Full)", category: "karahi", price: 2200, desc: "Full wok serving of authentic desi chicken karahi with rich aromatic gravy.", tag: "Fresh 30 Min", icon: "fa-bowl-rice" },
-            { id: "karahi-makhni-half", name: "Chicken Makhni Karahi (Half)", category: "karahi", price: 1350, desc: "Velvety butter gravy prepared with tender chicken and mild aromatic herbs.", tag: "Butter Special", icon: "fa-bowl-rice" },
-            { id: "karahi-white-half", name: "Chicken White Karahi (Half)", category: "karahi", price: 1350, desc: "Cream and yogurt base rich white sauce karahi with white pepper.", tag: "Creamy", icon: "fa-bowl-rice" },
-            { id: "karahi-mutton-half", name: "Mutton Karahi (Half)", category: "karahi", price: 2600, desc: "Fresh prime cuts of mutton cooked in traditional desi style.", tag: "Royal Mutton", icon: "fa-bowl-rice" },
-            { id: "handi-paneer-reshmi", name: "Paneer Reshmi Handi (Half)", category: "karahi", price: 1300, desc: "Clay pot cooked boneless chicken & paneer chunks in rich gravy.", tag: "Clay Pot Handi", icon: "fa-bowl-rice" },
-            { id: "tikka-chest", name: "Chicken Tikka (Chest Piece)", category: "bbq", price: 450, desc: "Juicy breast piece marinated in spicy Bin Riaz tandoori masala with 2 sauces free.", tag: "Charcoal Hot", icon: "fa-drumstick-bite" },
-            { id: "tikka-leg", name: "Chicken Tikka (Leg Piece)", category: "bbq", price: 400, desc: "Charcoal grilled tender leg quarter with 2 sauces free.", tag: "Charcoal Hot", icon: "fa-drumstick-bite" },
-            { id: "bbq-shangrila", name: "Shangrila Boti", category: "bbq", price: 950, desc: "Special skewered tender chicken with Bin Riaz house secret marinade.", tag: "Signature", icon: "fa-fire-flame-curved" },
-            { id: "bbq-malai-boti", name: "Malai Boti Plate", category: "bbq", price: 900, desc: "Melt in mouth boneless chicken boti grilled to perfection over embers.", tag: "Tender", icon: "fa-fire-flame-curved" },
-            { id: "bbq-reshmi-kabab", name: "Reshmi Kabab Plate", category: "bbq", price: 850, desc: "Fine minced chicken skewers seasoned with mild saffron spices & butter.", tag: "Chef Special", icon: "fa-fire-flame-curved" },
-            { id: "matka-biryani-half", name: "Special Matka Biryani (Boneless Half)", category: "chinese", price: 1250, desc: "Dum pukht fragrant basmati rice loaded with boneless marinated chicken + Free Raita.", tag: "Matka Dum", icon: "fa-bowl-rice" },
-            { id: "chowmein-special", name: "Bin Riaz Special Chow Mein", category: "chinese", price: 1000, desc: "Stir-fried noodles with chicken strips, crunchy vegetables, and signature sauces.", tag: "Wok Tossed", icon: "fa-utensils" },
-            { id: "chicken-chili-rice", name: "Chicken Chili with Rice", category: "chinese", price: 950, desc: "Spicy wok chicken chili paired with delicious egg fried rice.", tag: "Oriental", icon: "fa-bowl-food" },
-            { id: "naan-cheese", name: "Cheese Naan", category: "tandoor", price: 499, desc: "Fresh tandoori naan overflowing with gooey cheese.", tag: "Hot", icon: "fa-circle" },
-            { id: "naan-roghni", name: "Roghni Naan", category: "tandoor", price: 80, desc: "Traditional sesame seed garnished butter-glazed tandoori naan.", tag: "Classic", icon: "fa-circle" },
-            { id: "malwari-paratha", name: "Malwari Paratha", category: "tandoor", price: 70, desc: "Layered, crispy and golden fried Malwari style paratha.", tag: "Crispy", icon: "fa-circle" },
-            { id: "naan-plain", name: "Plain Naan / Roti", category: "tandoor", price: 30, desc: "Freshly baked clay oven tandoori bread.", tag: "Fresh", icon: "fa-circle" }
+            { id: "deal-1", name: "DEALS-1 (Jumbo Roll Special)", category: "deals", price: 500, desc: "1 Jumbo Roll Paratha + 2 Sauces + 300 ML Drink", tag: "Bestseller", icon: "fa-burger", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80" },
+            { id: "deal-2", name: "DEALS-2 (Duo Jumbo)", category: "deals", price: 1000, desc: "2 Jumbo Roll Paratha + 2 Drinks", tag: "Popular", icon: "fa-utensils", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80" },
+            { id: "deal-3", name: "DEALS-3 (Buy 5 Get 1 Free)", category: "deals", price: 1999, desc: "5 Roll Paratha + Get 1 Free Roll Paratha", tag: "Value Deal", icon: "fa-gift", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80" },
+            { id: "deal-4", name: "DEALS-4 (Family Feast)", category: "deals", price: 3200, desc: "7 Roll Paratha + Get 2 Free Sauces", tag: "Family", icon: "fa-users", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80" },
+            { id: "deal-5", name: "DEALS-5 (Mega Special)", category: "deals", price: 3999, desc: "10 Roll Paratha Special + Get 2 Jumbo Rolls Free", tag: "Mega Deal", icon: "fa-crown", image: "https://images.unsplash.com/photo-1561758033-d89a9ad46330?auto=format&fit=crop&w=600&q=80" },
+            { id: "desi-tarka", name: "DESI TARKA DEAL", category: "dawat", price: 1200, desc: "Tawa Chicken + 2 Sauces + 3 Malwari Paratha + 1 Special Drink", tag: "Desi Taste", icon: "fa-fire", image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=600&q=80" },
+            { id: "dawat-4-5", name: "DAWAT DESI DEAL (4 to 5 Person)", category: "dawat", price: 2600, desc: "Special Chicken Karahi (Extra Gravy) + Special Boneless Biryani (Matka) + 6 Roti/Naan + 2 Sauce Dips + 1000 ML Drink", tag: "4-5 Person", icon: "fa-bowl-food", image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=600&q=80" },
+            { id: "dawat-6-7", name: "DAWAT DESI DEAL (6 to 7 Person)", category: "dawat", price: 4200, desc: "Chicken Karahi Full (Extra Gravy) + Special BBQ Platter (with rice) + 8 Naan + 2 Special Sauces + Drink", tag: "Grand Feast", icon: "fa-champagne-glasses", image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80" },
+            { id: "platter-1", name: "BAR B Q PLATTER (1 Person)", category: "platters", price: 1300, desc: "Malai Boti / Chicken Boti / Behari Boti + Reshmi Kabab + Fried Rice / Malwari Paratha + Special Sauce", tag: "Solo Feast", icon: "fa-drumstick-bite", image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80" },
+            { id: "platter-2", name: "BAR B Q PLATTER (2 Person)", category: "platters", price: 2000, desc: "Malai Boti + Shangrila Boti + Chicken Boti + Behari Boti + Reshmi Kabab + Chinese Rice & 2 Malwari Paratha + Special Sauce", tag: "Duo Feast", icon: "fa-drumstick-bite", image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80" },
+            { id: "platter-3", name: "BAR B Q PLATTER (3 Person)", category: "platters", price: 3000, desc: "Malai Boti + Shangrila Boti + Behari Boti + Reshmi Kabab + Chicken Boti + Chicken Tikka + Full Chinese Rice & 3 Malwari Paratha + Special Sauce", tag: "Trio Royal", icon: "fa-drumstick-bite", image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80" },
+            { id: "roll-bin-riyaz", name: "Bin Riaz Special Roll (Jumbo)", category: "rolls", price: 450, desc: "Chef's signature charcoal chicken wrapped in freshly prepared crisp Malwari Paratha.", tag: "Must Try", icon: "fa-bread-slice", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80" },
+            { id: "roll-chatni", name: "Chicken Chatni Roll (Jumbo)", category: "rolls", price: 450, desc: "Smoky grilled chicken spiced with authentic spicy mint chutney & onions.", tag: "Spicy", icon: "fa-pepper-hot", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80" },
+            { id: "roll-cheese", name: "Chicken Cheese Roll (Jumbo)", category: "rolls", price: 450, desc: "Loaded with melted mozzarella and cheddar cheese over tender chicken cubes.", tag: "Cheesy", icon: "fa-cheese", image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=600&q=80" },
+            { id: "roll-mayo", name: "Chicken Mayo Roll (Jumbo)", category: "rolls", price: 450, desc: "Creamy garlic mayo tossed with charcoal grilled chicken.", tag: "Kids Fav", icon: "fa-bread-slice", image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=600&q=80" },
+            { id: "roll-malai", name: "Malai Boti Roll (Jumbo)", category: "rolls", price: 450, desc: "Ultra tender boneless chicken infused with mild spices & cream.", tag: "Mild", icon: "fa-bread-slice", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80" },
+            { id: "roll-behari", name: "Behari Kabab Roll (Jumbo)", category: "rolls", price: 450, desc: "Authentic Bihari spiced tender meat roll with smoky flavor.", tag: "Smoky", icon: "fa-bread-slice", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80" },
+            { id: "roll-cheese-paratha", name: "Cheese Paratha (Special)", category: "rolls", price: 800, desc: "Stuffed whole wheat crispy paratha bursting with premium molten cheese.", tag: "Cheese Lover", icon: "fa-circle-dot", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80" },
+            { id: "karahi-chicken-half", name: "Chicken Karahi (Half)", category: "karahi", price: 1150, desc: "Prepared fresh on wok with fresh tomatoes, ginger, green chilies, and pure spices.", tag: "Fresh 30 Min", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=600&q=80" },
+            { id: "karahi-chicken-full", name: "Chicken Karahi (Full)", category: "karahi", price: 2200, desc: "Full wok serving of authentic desi chicken karahi with rich aromatic gravy.", tag: "Fresh 30 Min", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=600&q=80" },
+            { id: "karahi-makhni-half", name: "Chicken Makhni Karahi (Half)", category: "karahi", price: 1350, desc: "Velvety butter gravy prepared with tender chicken and mild aromatic herbs.", tag: "Butter Special", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&w=600&q=80" },
+            { id: "karahi-white-half", name: "Chicken White Karahi (Half)", category: "karahi", price: 1350, desc: "Cream and yogurt base rich white sauce karahi with white pepper.", tag: "Creamy", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=600&q=80" },
+            { id: "karahi-mutton-half", name: "Mutton Karahi (Half)", category: "karahi", price: 2600, desc: "Fresh prime cuts of mutton cooked in traditional desi style.", tag: "Royal Mutton", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1545247181-516773cae754?auto=format&fit=crop&w=600&q=80" },
+            { id: "handi-paneer-reshmi", name: "Paneer Reshmi Handi (Half)", category: "karahi", price: 1300, desc: "Clay pot cooked boneless chicken & paneer chunks in rich gravy.", tag: "Clay Pot Handi", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=600&q=80" },
+            { id: "tikka-chest", name: "Chicken Tikka (Chest Piece)", category: "bbq", price: 450, desc: "Juicy breast piece marinated in spicy Bin Riaz tandoori masala with 2 sauces free.", tag: "Charcoal Hot", icon: "fa-drumstick-bite", image: "https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=600&q=80" },
+            { id: "tikka-leg", name: "Chicken Tikka (Leg Piece)", category: "bbq", price: 400, desc: "Charcoal grilled tender leg quarter with 2 sauces free.", tag: "Charcoal Hot", icon: "fa-drumstick-bite", image: "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=600&q=80" },
+            { id: "bbq-shangrila", name: "Shangrila Boti", category: "bbq", price: 950, desc: "Special skewered tender chicken with Bin Riaz house secret marinade.", tag: "Signature", icon: "fa-fire-flame-curved", image: "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=600&q=80" },
+            { id: "bbq-malai-boti", name: "Malai Boti Plate", category: "bbq", price: 900, desc: "Melt in mouth boneless chicken boti grilled to perfection over embers.", tag: "Tender", icon: "fa-fire-flame-curved", image: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=600&q=80" },
+            { id: "bbq-reshmi-kabab", name: "Reshmi Kabab Plate", category: "bbq", price: 850, desc: "Fine minced chicken skewers seasoned with mild saffron spices & butter.", tag: "Chef Special", icon: "fa-fire-flame-curved", image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80" },
+            { id: "matka-biryani-half", name: "Special Matka Biryani (Boneless Half)", category: "chinese", price: 1250, desc: "Dum pukht fragrant basmati rice loaded with boneless marinated chicken + Free Raita.", tag: "Matka Dum", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80" },
+            { id: "chowmein-special", name: "Bin Riaz Special Chow Mein", category: "chinese", price: 1000, desc: "Stir-fried noodles with chicken strips, crunchy vegetables, and signature sauces.", tag: "Wok Tossed", icon: "fa-utensils", image: "https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&w=600&q=80" },
+            { id: "chicken-chili-rice", name: "Chicken Chili with Rice", category: "chinese", price: 950, desc: "Spicy wok chicken chili paired with delicious egg fried rice.", tag: "Oriental", icon: "fa-bowl-food", image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=600&q=80" },
+            { id: "naan-cheese", name: "Cheese Naan", category: "tandoor", price: 499, desc: "Fresh tandoori naan overflowing with gooey cheese.", tag: "Hot", icon: "fa-circle", image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80" },
+            { id: "naan-roghni", name: "Roghni Naan", category: "tandoor", price: 80, desc: "Traditional sesame seed garnished butter-glazed tandoori naan.", tag: "Classic", icon: "fa-circle", image: "https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?auto=format&fit=crop&w=600&q=80" },
+            { id: "malwari-paratha", name: "Malwari Paratha", category: "tandoor", price: 70, desc: "Layered, crispy and golden fried Malwari style paratha.", tag: "Crispy", icon: "fa-circle", image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=600&q=80" },
+            { id: "naan-plain", name: "Plain Naan / Roti", category: "tandoor", price: 30, desc: "Freshly baked clay oven tandoori bread.", tag: "Fresh", icon: "fa-circle", image: "https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?auto=format&fit=crop&w=600&q=80" }
         ];
 
         let storedMenu = null;
@@ -198,7 +209,23 @@ window.syncMenuOnline = function(rawItems) {
                 storedMenu = parsed;
             }
         } catch(e) {}
-        window.menuItems = storedMenu || [...defaultMenuItems];
+
+        // Ensure every item has its authentic image from defaultMenuItems
+        const initialMenu = (storedMenu || [...defaultMenuItems]).map(item => {
+            const found = defaultMenuItems.find(d => d.id === item.id);
+            if (found && found.image) {
+                // If item has no image or is using a legacy mismatched image
+                if (!item.image || item.image.includes('photo-1541592106381') || item.image.includes('photo-1550547660') || item.image.includes('photo-1627308595229') || item.image.includes('photo-1594041680534') || item.image.includes('photo-1567620832903')) {
+                    item.image = found.image;
+                }
+            }
+            return item;
+        });
+
+        window.menuItems = initialMenu;
+        try {
+            localStorage.setItem('binRiazMenuData', JSON.stringify(window.menuItems));
+        } catch(e) {}
         window.cart = [];
         window.currentFilter = 'all';
         window.layoutMode = localStorage.getItem('binRiazLayoutMode') || 'vertical';
@@ -1085,14 +1112,41 @@ window.viewOrderSlip = function(orderId) {
     const order = orders.find(o => o.orderId === orderId);
     if (!order) return;
     window.currentViewingOrderId = order.orderId;
-    window.currentViewingOrderSlip = order.slipText || (
-        "👑 BIN RIAZ GRILL RESTAURANT 👑\n" +
-        "Order ID: " + order.orderId + "\n" +
-        "Date: " + order.date + "\n" +
-        "Customer: " + order.customerName + " (" + order.customerPhone + ")\n" +
-        "Address: " + order.deliveryAddress + "\n" +
-        "Total: Rs. " + order.totalPayable
-    );
+    
+    let textSlip = order.slipText;
+    if (!textSlip || !textSlip.includes('SH COMPANY')) {
+        const itemsList = (order.items || []).map(i => `• ${i.qty || 1}x ${i.name} - Rs. ${((Number(i.price) || 0) * (Number(i.qty) || 1)).toLocaleString()}`).join('\n');
+        textSlip = 
+`================================
+      BIN RIAZ GRILL
+   RESTAURANT & TANDOOR
+ Authentic Charcoal & Desi Cuisine
+ Jinnah Center, Pakiza Cash & Carry,
+ Jinnah Garden, Islamabad
+ Tel: 0332-5044423
+================================
+ORDER ID: ${order.orderId || 'ORD-NEW'}
+DATE/TIME: ${order.date || new Date().toLocaleString()}
+--------------------------------
+CUSTOMER: ${order.customerName || 'Walk-in Customer'}
+PHONE: ${order.customerPhone || 'N/A'}
+ADDRESS: ${order.deliveryAddress || 'Dine-in / Takeaway'}
+--------------------------------
+ORDER ITEMS:
+${itemsList || 'Special Order Items'}
+--------------------------------
+Subtotal: Rs. ${(Number(order.subTotal) || 0).toLocaleString()}
+${Number(order.discountAmt) > 0 ? `Discount: -Rs. ${Number(order.discountAmt).toLocaleString()}\n` : ''}TOTAL PAYABLE: Rs. ${(Number(order.totalPayable) || 0).toLocaleString()}/-
+================================
+  *** THANK YOU FOR YOUR ORDER ***
+--------------------------------
+For Custom Websites, Apps & Software:
+Contact / WhatsApp: +92 315 5496788
+Developed by SH COMPANY
+================================`;
+    }
+
+    window.currentViewingOrderSlip = textSlip;
     const slipEl = document.getElementById('orderSlipContent');
     if (slipEl) slipEl.innerText = window.currentViewingOrderSlip;
     const modal = document.getElementById('orderSlipModal');
@@ -1112,9 +1166,9 @@ window.generateReceiptHtml = function(order) {
         const itemTotal = itemPrice * itemQty;
         return `
             <tr>
-                <td style="padding: 4px 0; vertical-align: top; font-weight: bold;">${itemQty}x</td>
-                <td style="padding: 4px 4px; vertical-align: top;">${escapeHtml(item.name || 'Special Dish')}</td>
-                <td style="padding: 4px 0; vertical-align: top; text-align: right; white-space: nowrap;">Rs. ${itemTotal.toLocaleString()}</td>
+                <td style="padding: 3px 0; vertical-align: top; font-weight: bold; width: 15%;">${itemQty}x</td>
+                <td style="padding: 3px 4px; vertical-align: top; width: 55%;">${escapeHtml(item.name || 'Special Dish')}</td>
+                <td style="padding: 3px 0; vertical-align: top; text-align: right; white-space: nowrap; width: 30%;">Rs. ${itemTotal.toLocaleString()}</td>
             </tr>
         `;
     }).join('');
@@ -1124,33 +1178,37 @@ window.generateReceiptHtml = function(order) {
     const totalPayable = Number(order.totalPayable || 0);
 
     return `
-        <div style="width: 100%; max-width: 320px; margin: 0 auto; padding: 12px; font-family: 'Courier New', Courier, monospace; color: #000; background: #fff; font-size: 12px; line-height: 1.35;">
-            <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 6px;">
-                <div style="font-size: 16px; font-weight: 900; letter-spacing: 0.5px;">👑 BIN RIAZ GRILL 👑</div>
-                <div style="font-size: 12px; font-weight: bold; margin-top: 2px;">RESTAURANT & TANDOOR</div>
-                <div style="font-size: 10px; margin-top: 1px;">Authentic Charcoal & Desi Cuisine</div>
-                <div style="font-size: 10px;">Jinnah Center, Pakiza Cash & Carry, Islamabad</div>
-                <div style="font-size: 11px; font-weight: bold; margin-top: 2px;">Tel: 0332-5044423</div>
+        <div class="thermal-pos-slip" style="width: 100%; max-width: 290px; margin: 0 auto; padding: 6px 8px; font-family: 'Courier New', Courier, monospace; color: #000; background: #fff; font-size: 11px; line-height: 1.35; letter-spacing: -0.2px;">
+            <!-- 1. TOP RESTAURANT HEADER -->
+            <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 5px; margin-bottom: 6px;">
+                <div style="font-size: 16px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase;">BIN RIAZ GRILL</div>
+                <div style="font-size: 12px; font-weight: bold; margin-top: 1px;">RESTAURANT & TANDOOR</div>
+                <div style="font-size: 10px; margin-top: 2px;">Authentic Charcoal & Desi Cuisine</div>
+                <div style="font-size: 9.5px; margin-top: 1px;">Jinnah Center, Near Pakiza Cash & Carry, Islamabad</div>
+                <div style="font-size: 11px; font-weight: bold; margin-top: 2px;">Tel / WhatsApp: 0332-5044423</div>
+                <div style="font-size: 8.5px; margin-top: 3px; letter-spacing: 0.5px;">================================</div>
             </div>
 
+            <!-- 2. MIDDLE ORDER DETAILS -->
             <div style="font-size: 11px; margin-bottom: 5px;">
                 <div style="display: flex; justify-content: space-between;"><span style="font-weight: bold;">Order No:</span> <span style="font-weight: bold;">${escapeHtml(order.orderId || 'ORD-NEW')}</span></div>
                 <div style="display: flex; justify-content: space-between;"><span>Date/Time:</span> <span>${escapeHtml(order.date || new Date().toLocaleString())}</span></div>
             </div>
 
-            <div style="border-top: 1px dashed #000; padding-top: 5px; margin-bottom: 5px; font-size: 11px;">
-                <div><span style="font-weight: bold;">Customer:</span> ${escapeHtml(order.customerName || 'Customer')}</div>
+            <div style="border-top: 1px dashed #000; padding-top: 4px; margin-bottom: 5px; font-size: 10.5px;">
+                <div><span style="font-weight: bold;">Customer:</span> ${escapeHtml(order.customerName || 'Walk-in Customer')}</div>
                 <div><span style="font-weight: bold;">Contact:</span> ${escapeHtml(order.customerPhone || 'N/A')}</div>
-                <div><span style="font-weight: bold;">Address/Table:</span> ${escapeHtml(order.deliveryAddress || 'Dine-in / Delivery')}</div>
+                <div><span style="font-weight: bold;">Address:</span> ${escapeHtml(order.deliveryAddress || 'Dine-in / Delivery')}</div>
             </div>
 
+            <!-- ITEMS TABLE -->
             <div style="border-top: 1px dashed #000; padding-top: 4px; margin-bottom: 5px;">
                 <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
                     <thead>
                         <tr style="border-bottom: 1px dashed #000; text-align: left;">
-                            <th style="padding-bottom: 3px; width: 15%;">Qty</th>
-                            <th style="padding-bottom: 3px; width: 55%;">Item</th>
-                            <th style="padding-bottom: 3px; width: 30%; text-align: right;">Amount</th>
+                            <th style="padding-bottom: 3px; width: 15%; font-weight: bold;">Qty</th>
+                            <th style="padding-bottom: 3px; width: 55%; font-weight: bold;">Item</th>
+                            <th style="padding-bottom: 3px; width: 30%; text-align: right; font-weight: bold;">Amount</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1159,20 +1217,32 @@ window.generateReceiptHtml = function(order) {
                 </table>
             </div>
 
+            <!-- TOTALS -->
             <div style="border-top: 1px dashed #000; padding-top: 5px; margin-bottom: 5px; font-size: 11px;">
                 <div style="display: flex; justify-content: space-between;"><span>Subtotal:</span> <span>Rs. ${subTotal.toLocaleString()}</span></div>
                 ${discountAmt > 0 ? `<div style="display: flex; justify-content: space-between;"><span>Discount:</span> <span>-Rs. ${discountAmt.toLocaleString()}</span></div>` : ''}
-                <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 900; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 0; margin-top: 4px;">
+                <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 900; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 0; margin-top: 4px;">
                     <span>TOTAL PAYABLE:</span>
                     <span>Rs. ${totalPayable.toLocaleString()}/-</span>
                 </div>
             </div>
 
-            <div style="text-align: center; border-top: 1px dashed #000; padding-top: 6px; font-size: 10px; line-height: 1.4;">
-                <div style="font-weight: bold;">⚡ 50 Minutes Delivery Guarantee ⚡</div>
-                <div>Official WhatsApp Verified Order</div>
-                <div style="margin-top: 3px; font-weight: bold;">*** THANK YOU FOR YOUR ORDER ***</div>
-                <div style="font-size: 9px; color: #333;">Customer & Kitchen Billing Copy</div>
+            <!-- ORDER COMPLETE MESSAGE -->
+            <div style="text-align: center; border-top: 1px dashed #000; padding-top: 5px; font-size: 10px; line-height: 1.35;">
+                <div style="font-weight: bold;">⚡ 50 Minutes Delivery Promise ⚡</div>
+                <div style="margin-top: 2px; font-weight: bold;">*** THANK YOU FOR YOUR ORDER ***</div>
+                <div style="font-size: 9px;">Freshly Prepared • Hot & Delicious</div>
+            </div>
+
+            <!-- 3. END BOTTOM PROMOTION -->
+            <div style="text-align: center; border-top: 1px dashed #000; padding-top: 6px; margin-top: 6px; font-size: 9.5px; line-height: 1.35;">
+                <div style="font-size: 8.5px; letter-spacing: 0.5px;">================================</div>
+                <div style="font-weight: bold; margin-top: 2px;">For Custom Websites, Apps & POS Software:</div>
+                <div style="font-size: 11px; font-weight: 900; letter-spacing: 0.5px; margin: 2px 0;">📞 +92 315 5496788</div>
+                <div style="font-weight: bold; text-transform: uppercase; font-size: 10px; border-top: 1px dotted #000; padding-top: 2px; margin-top: 3px;">
+                    DEVELOPED BY SH COMPANY
+                </div>
+                <div style="font-size: 8.5px; letter-spacing: 0.5px; margin-top: 2px;">================================</div>
             </div>
         </div>
     `;
@@ -1663,6 +1733,11 @@ try {
         } catch (e) {}
         if (typeof window.renderFilteredMenu === 'function') window.renderFilteredMenu();
         if (typeof window.refreshAdminItemsList === 'function') window.refreshAdminItemsList();
+
+        // If cloud items were missing images, write back the full sanitized items with images
+        if (items.some(i => !i.image)) {
+          set(menuRef, window.menuItems).catch(() => {});
+        }
       }
     } else {
       // RTDB menu node is empty: check Firestore first before seeding defaults
