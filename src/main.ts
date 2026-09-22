@@ -552,6 +552,79 @@ window.syncMenuOnline = function(rawItems) {
             window.updateCartUI();
         };
 
+        window.calculateModifiers = function() {
+            let drinkCost = 0;
+            let drinkName = "";
+            const drinkSelect = document.getElementById('checkoutDrinkSelect');
+            const drinkFlavorSelect = document.getElementById('checkoutDrinkFlavor');
+            const drinkFlavorBox = document.getElementById('drinkFlavorBox');
+            const drinkPriceTag = document.getElementById('drinkPriceTag');
+
+            if (drinkSelect && drinkSelect.value !== 'none') {
+                const selectedOption = drinkSelect.options[drinkSelect.selectedIndex];
+                drinkCost = parseInt(selectedOption.getAttribute('data-price') || '0', 10) || 0;
+                const flavor = (drinkFlavorSelect && drinkFlavorSelect.value) ? drinkFlavorSelect.value : "Standard";
+                drinkName = `${selectedOption.text.replace(/\(\+Rs\..*\)/, '').trim()} (${flavor})`;
+                if (drinkFlavorBox) drinkFlavorBox.classList.remove('hidden');
+                if (drinkPriceTag) drinkPriceTag.innerText = `+Rs. ${drinkCost}`;
+            } else {
+                if (drinkFlavorBox) drinkFlavorBox.classList.add('hidden');
+                if (drinkPriceTag) drinkPriceTag.innerText = `Rs. 0`;
+            }
+
+            const extras = [];
+            let extrasCost = 0;
+            const modElements = [
+                { id: 'modGravy', name: 'Extra Karahi Gravy & Ginger', price: 150 },
+                { id: 'modSauces', name: 'Extra Sauces (Mint + Garlic Mayo)', price: 50 },
+                { id: 'modRaita', name: 'Extra Fresh Salad & Mint Raita', price: 80 },
+                { id: 'modParatha', name: 'Extra Crispy Malwari Paratha', price: 70 },
+                { id: 'modNaan', name: 'Extra Butter Roghni Naan', price: 80 }
+            ];
+
+            modElements.forEach(m => {
+                const el = document.getElementById(m.id);
+                if (el && el.checked) {
+                    extras.push(m.name);
+                    extrasCost += m.price;
+                }
+            });
+
+            const spiceEl = document.querySelector('input[name="spiceLevel"]:checked');
+            const spiceLevel = spiceEl ? spiceEl.value : "Medium (Normal)";
+
+            const totalModifiersCost = drinkCost + extrasCost;
+
+            const badge = document.getElementById('modifiersCostBadge');
+            if (badge) {
+                badge.innerText = totalModifiersCost > 0 ? `+Rs. ${totalModifiersCost} Extras` : 'No Extras';
+            }
+
+            const modRow = document.getElementById('modifiersSubTotalRow');
+            const modDisplay = document.getElementById('modifiersSubTotalDisplay');
+            if (modRow && modDisplay) {
+                if (totalModifiersCost > 0) {
+                    modRow.classList.remove('hidden');
+                    modDisplay.innerText = `+ Rs. ${totalModifiersCost}`;
+                } else {
+                    modRow.classList.add('hidden');
+                }
+            }
+
+            return {
+                drinkCost,
+                drinkName,
+                extras,
+                extrasCost,
+                spiceLevel,
+                totalModifiersCost
+            };
+        };
+
+        window.handleModifierChange = function() {
+            window.updateCartUI();
+        };
+
         window.updateCartUI = function() {
             const container = document.getElementById('cartItemsContainer');
             const countBadge = document.getElementById('cartCountBadge');
@@ -563,13 +636,17 @@ window.syncMenuOnline = function(rawItems) {
             const totalCount = window.cart.reduce((acc, item) => acc + item.qty, 0);
             countBadge.innerText = totalCount;
 
-            const subTotalPrice = window.cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-            subTotalDisplay.innerText = `Rs. ${subTotalPrice}`;
+            const dishesSubTotal = window.cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            const modifiersInfo = window.calculateModifiers ? window.calculateModifiers() : { totalModifiersCost: 0 };
+            const modifiersCost = window.cart.length > 0 ? (modifiersInfo.totalModifiersCost || 0) : 0;
+            const combinedSubTotal = dishesSubTotal + modifiersCost;
 
-            let finalPrice = subTotalPrice;
-            if (window.currentUser && window.memberDiscountPercent > 0 && subTotalPrice > 0) {
-                const discountAmt = Math.round((subTotalPrice * window.memberDiscountPercent) / 100);
-                finalPrice = subTotalPrice - discountAmt;
+            subTotalDisplay.innerText = `Rs. ${dishesSubTotal}`;
+
+            let finalPrice = combinedSubTotal;
+            if (window.currentUser && window.memberDiscountPercent > 0 && dishesSubTotal > 0) {
+                const discountAmt = Math.round((dishesSubTotal * window.memberDiscountPercent) / 100);
+                finalPrice = Math.max(0, combinedSubTotal - discountAmt);
                 discountRow.classList.remove('hidden');
                 discountDisplay.innerText = `- Rs. ${discountAmt} (${window.memberDiscountPercent}%)`;
             } else {
@@ -677,18 +754,32 @@ window.syncMenuOnline = function(rawItems) {
             const name = document.getElementById('custName').value.trim();
             const phone = document.getElementById('custPhone').value.trim();
             const address = document.getElementById('custAddress').value.trim();
+            const notesEl = document.getElementById('custNotes');
+            const notes = notesEl ? notesEl.value.trim() : "";
 
             if (!name || !phone || !address) {
                 alert("Please fill in your Name, Phone Number, and Delivery Address / Table Number.");
                 return;
             }
 
-            const subTotal = window.cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            const modifiersInfo = window.calculateModifiers ? window.calculateModifiers() : {
+                drinkCost: 0,
+                drinkName: "",
+                extras: [],
+                extrasCost: 0,
+                spiceLevel: "Medium (Normal)",
+                totalModifiersCost: 0
+            };
+
+            const dishesSubTotal = window.cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            const modifiersCost = modifiersInfo.totalModifiersCost || 0;
+            const combinedSubTotal = dishesSubTotal + modifiersCost;
+
             let discountAmt = 0;
             if (window.currentUser && window.memberDiscountPercent > 0) {
-                discountAmt = Math.round((subTotal * window.memberDiscountPercent) / 100);
+                discountAmt = Math.round((dishesSubTotal * window.memberDiscountPercent) / 100);
             }
-            const netTotal = subTotal - discountAmt;
+            const netTotal = Math.max(0, combinedSubTotal - discountAmt);
             const dateNow = new Date().toLocaleString('en-US', { hour12: true });
 
             let slip = `*================================*\n`;
@@ -703,14 +794,35 @@ window.syncMenuOnline = function(rawItems) {
             if (window.currentUser) {
                 slip += `*👑 Member Account:* ${window.currentUser.email} (${window.memberDiscountPercent}% Discount)\n`;
             }
-            slip += `\n*-------- 🛒 ORDER DETAILS --------*\n`;
+
+            slip += `\n*-------- 🛒 ORDER DISHES & DEALS --------*\n`;
             window.cart.forEach((item, index) => {
                 slip += `${index + 1}. *${item.name}*\n`;
                 slip += `    Qty: ${item.qty} x Rs. ${item.price} = *Rs. ${item.qty * item.price}*\n`;
             });
+
+            // Modifiers & Add-ons
+            if (modifiersInfo.drinkName || modifiersInfo.extras.length > 0 || modifiersInfo.spiceLevel) {
+                slip += `\n*-------- 🥤 ADD-ONS & CUSTOMIZATION --------*\n`;
+                if (modifiersInfo.drinkName) {
+                    slip += `• *Cold Drink:* ${modifiersInfo.drinkName} (+Rs. ${modifiersInfo.drinkCost})\n`;
+                }
+                if (modifiersInfo.extras.length > 0) {
+                    slip += `• *Extras / Sauces / Gravy:* ${modifiersInfo.extras.join(', ')} (+Rs. ${modifiersInfo.extrasCost})\n`;
+                }
+                slip += `• *Spice Level Preference:* ${modifiersInfo.spiceLevel}\n`;
+            }
+
+            if (notes) {
+                slip += `\n*-------- 📝 SPECIAL INSTRUCTIONS --------*\n`;
+                slip += `"${notes}"\n`;
+            }
             
             slip += `\n*----------------------------------*\n`;
-            slip += `*Subtotal:* Rs. ${subTotal}/-\n`;
+            slip += `*Dishes Subtotal:* Rs. ${dishesSubTotal}/-\n`;
+            if (modifiersCost > 0) {
+                slip += `*Add-ons & Extras:* +Rs. ${modifiersCost}/-\n`;
+            }
             if (discountAmt > 0) {
                 slip += `*Member Discount (${window.memberDiscountPercent}%):* -Rs. ${discountAmt}/-\n`;
             }
@@ -720,12 +832,11 @@ window.syncMenuOnline = function(rawItems) {
             slip += `*📍 Kitchen Location:* Jinnah Center, Near Pakiza Cash & Carry, Jinnah Garden, Islamabad.\n`;
             slip += `_Please confirm my order as soon as possible! Thank you!_`;
 
-            
             // Cloud Sync Order to Firebase RTDB
             try {
                 if (window.firebaseDB && window.fbRef && window.fbSet) {
                     const orderId = 'ORD-' + Date.now();
-                    window.fbSet(window.fbRef(window.firebaseDB, 'binRiazGrill/orders/' + orderId), {
+                    const orderRecord = {
                         orderId: orderId,
                         timestamp: Date.now(),
                         date: dateNow,
@@ -734,19 +845,41 @@ window.syncMenuOnline = function(rawItems) {
                         deliveryAddress: address,
                         memberEmail: window.currentUser ? window.currentUser.email : null,
                         items: window.cart.map(function(i) { return { id: i.id, name: i.name, price: i.price, qty: i.qty }; }),
-                        subTotal: subTotal,
+                        notes: notes || null,
+                        drink: modifiersInfo.drinkName || null,
+                        extras: modifiersInfo.extras,
+                        spiceLevel: modifiersInfo.spiceLevel,
+                        modifiersTotal: modifiersCost,
+                        subTotal: dishesSubTotal,
                         discountAmt: discountAmt,
                         totalPayable: netTotal,
+                        slipText: slip,
                         status: 'placed'
-                    }).catch(function(err) { console.warn('Order sync note:', err); });
+                    };
+                    window.fbSet(window.fbRef(window.firebaseDB, 'binRiazGrill/orders/' + orderId), orderRecord)
+                        .catch(function(err) { console.warn('Order sync note:', err); });
+                    
+                    // Add to local admin orders cache as well
+                    if (!window.adminOrders) window.adminOrders = [];
+                    window.adminOrders.unshift(orderRecord);
+                    try {
+                        localStorage.setItem('binRiazOrders', JSON.stringify(window.adminOrders));
+                    } catch(e) {}
                 }
             } catch (e) {
                 console.warn('Order sync error:', e);
             }
             startDeliveryCountdown();
 
-
+            // Clear Cart & inputs
             window.cart = [];
+            if (notesEl) notesEl.value = "";
+            const drinkSelect = document.getElementById('checkoutDrinkSelect');
+            if (drinkSelect) drinkSelect.value = "none";
+            ['modGravy', 'modSauces', 'modRaita', 'modParatha', 'modNaan'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.checked = false;
+            });
             window.updateCartUI();
             window.toggleCartDrawer();
             window.showToast("Order Placed! Cart is now empty. 🛒");
@@ -1199,6 +1332,10 @@ window.generateReceiptHtml = function(order) {
                 <div><span style="font-weight: bold;">Customer:</span> ${escapeHtml(order.customerName || 'Walk-in Customer')}</div>
                 <div><span style="font-weight: bold;">Contact:</span> ${escapeHtml(order.customerPhone || 'N/A')}</div>
                 <div><span style="font-weight: bold;">Address:</span> ${escapeHtml(order.deliveryAddress || 'Dine-in / Delivery')}</div>
+                ${order.notes ? `<div style="margin-top: 2px;"><span style="font-weight: bold;">Notes:</span> <em>${escapeHtml(order.notes)}</em></div>` : ''}
+                ${order.drink ? `<div style="margin-top: 2px;"><span style="font-weight: bold;">Drink:</span> ${escapeHtml(order.drink)}</div>` : ''}
+                ${order.extras && order.extras.length > 0 ? `<div style="margin-top: 2px;"><span style="font-weight: bold;">Extras:</span> ${order.extras.map(e => typeof e === 'string' ? escapeHtml(e) : `${escapeHtml(e.name)} (+Rs. ${e.price})`).join(', ')}</div>` : ''}
+                ${order.spiceLevel ? `<div style="margin-top: 2px;"><span style="font-weight: bold;">Spice:</span> ${escapeHtml(order.spiceLevel)}</div>` : ''}
             </div>
 
             <!-- ITEMS TABLE -->
@@ -1558,48 +1695,245 @@ window.openAdminDashboard = function() {
             }
         };
 
+        window.handleImageUrlInput = function(url) {
+            const trimmed = (url || '').trim();
+            if (trimmed) {
+                window.uploadedImageBase64 = trimmed;
+                const previewImg = document.getElementById('imagePreviewImg');
+                const previewContainer = document.getElementById('imagePreviewContainer');
+                const selectedText = document.getElementById('imageSelectedText');
+                if (previewImg) previewImg.src = trimmed;
+                if (previewContainer) previewContainer.classList.remove('hidden');
+                if (selectedText) {
+                    selectedText.innerText = "Web link image attached";
+                    selectedText.className = "text-xs text-green-400 font-semibold";
+                }
+            }
+        };
+
         window.handleImageFile = function(input) {
-            if (input.files && input.files[0]) {
+            if (input && input.files && input.files[0]) {
                 const file = input.files[0];
-                document.getElementById('imageSelectedText').innerText = "Processing image...";
-                document.getElementById('imageSelectedText').className = "text-xs text-amber-400 font-semibold";
+                const selectedText = document.getElementById('imageSelectedText');
+                if (selectedText) {
+                    selectedText.innerText = "Processing image...";
+                    selectedText.className = "text-xs text-amber-400 font-semibold";
+                }
 
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const img = new Image();
                     img.onload = function() {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-                        const maxDim = 600;
+                        try {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
+                            const maxDim = 600;
 
-                        if (width > height) {
-                            if (width > maxDim) {
-                                height = Math.round((height * maxDim) / width);
-                                width = maxDim;
+                            if (width > height) {
+                                if (width > maxDim) {
+                                    height = Math.round((height * maxDim) / width);
+                                    width = maxDim;
+                                }
+                            } else {
+                                if (height > maxDim) {
+                                    width = Math.round((width * maxDim) / height);
+                                    height = maxDim;
+                                }
                             }
-                        } else {
-                            if (height > maxDim) {
-                                width = Math.round((width * maxDim) / height);
-                                height = maxDim;
+
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            if (ctx) {
+                                ctx.drawImage(img, 0, 0, width, height);
+                                window.uploadedImageBase64 = canvas.toDataURL('image/jpeg', 0.75);
+                                const previewImg = document.getElementById('imagePreviewImg');
+                                const previewContainer = document.getElementById('imagePreviewContainer');
+                                if (previewImg) previewImg.src = window.uploadedImageBase64;
+                                if (previewContainer) previewContainer.classList.remove('hidden');
+                                if (selectedText) {
+                                    selectedText.innerText = file.name;
+                                    selectedText.className = "text-xs text-green-400 font-semibold";
+                                }
                             }
+                        } catch (err) {
+                            console.warn("Image canvas error:", err);
                         }
-
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        window.uploadedImageBase64 = canvas.toDataURL('image/jpeg', 0.75);
-                        document.getElementById('imagePreviewImg').src = window.uploadedImageBase64;
-                        document.getElementById('imagePreviewContainer').classList.remove('hidden');
-                        document.getElementById('imageSelectedText').innerText = file.name;
-                        document.getElementById('imageSelectedText').className = "text-xs text-green-400 font-semibold";
                     };
                     img.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
             }
+        };
+
+        // ================= EDIT MENU ITEM HANDLERS =================
+        window.editUploadedImageBase64 = "";
+
+        window.openEditMenuItemModal = function(id) {
+            const item = (window.menuItems || []).find(i => String(i.id) === String(id));
+            if (!item) {
+                window.showToast("Dish not found!", "error");
+                return;
+            }
+
+            const idInput = document.getElementById('editItemId');
+            const nameInput = document.getElementById('editFoodName');
+            const catSelect = document.getElementById('editFoodCategory');
+            const priceInput = document.getElementById('editFoodPrice');
+            const tagInput = document.getElementById('editFoodTag');
+            const descInput = document.getElementById('editFoodDesc');
+            const urlInput = document.getElementById('editImageUrlInput');
+            const previewImg = document.getElementById('editImagePreviewImg');
+            const selectedText = document.getElementById('editImageSelectedText');
+
+            if (idInput) idInput.value = item.id;
+            if (nameInput) nameInput.value = item.name || '';
+            if (catSelect) catSelect.value = item.category || 'deals';
+            if (priceInput) priceInput.value = item.price || 0;
+            if (tagInput) tagInput.value = item.tag || '';
+            if (descInput) descInput.value = item.desc || '';
+            if (urlInput) urlInput.value = (item.image && item.image.startsWith('http')) ? item.image : '';
+            if (previewImg) previewImg.src = item.image || '';
+            if (selectedText) {
+                selectedText.innerText = item.image ? "Active menu picture loaded" : "No picture set";
+                selectedText.className = "text-xs text-gray-400 italic";
+            }
+            window.editUploadedImageBase64 = item.image || "";
+
+            const modal = document.getElementById('editItemModal');
+            if (modal) modal.classList.remove('hidden');
+        };
+
+        window.closeEditMenuItemModal = function() {
+            const modal = document.getElementById('editItemModal');
+            if (modal) modal.classList.add('hidden');
+            window.editUploadedImageBase64 = "";
+        };
+
+        window.handleEditImageUrlInput = function(url) {
+            const trimmed = (url || '').trim();
+            if (trimmed) {
+                window.editUploadedImageBase64 = trimmed;
+                const previewImg = document.getElementById('editImagePreviewImg');
+                const selectedText = document.getElementById('editImageSelectedText');
+                if (previewImg) previewImg.src = trimmed;
+                if (selectedText) {
+                    selectedText.innerText = "Web link image attached";
+                    selectedText.className = "text-xs text-green-400 font-semibold";
+                }
+            }
+        };
+
+        window.handleEditImageFile = function(input) {
+            if (input && input.files && input.files[0]) {
+                const file = input.files[0];
+                const selectedText = document.getElementById('editImageSelectedText');
+                if (selectedText) {
+                    selectedText.innerText = "Processing image...";
+                    selectedText.className = "text-xs text-amber-400 font-semibold";
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
+                            const maxDim = 600;
+
+                            if (width > height) {
+                                if (width > maxDim) {
+                                    height = Math.round((height * maxDim) / width);
+                                    width = maxDim;
+                                }
+                            } else {
+                                if (height > maxDim) {
+                                    width = Math.round((width * maxDim) / height);
+                                    height = maxDim;
+                                }
+                            }
+
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            if (ctx) {
+                                ctx.drawImage(img, 0, 0, width, height);
+                                window.editUploadedImageBase64 = canvas.toDataURL('image/jpeg', 0.75);
+                                const previewImg = document.getElementById('editImagePreviewImg');
+                                if (previewImg) previewImg.src = window.editUploadedImageBase64;
+                                if (selectedText) {
+                                    selectedText.innerText = file.name;
+                                    selectedText.className = "text-xs text-green-400 font-semibold";
+                                }
+                            }
+                        } catch(err) {
+                            console.warn("Edit image canvas error:", err);
+                        }
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        window.saveEditedMenuItem = function() {
+            const id = (document.getElementById('editItemId') as HTMLInputElement)?.value;
+            const name = (document.getElementById('editFoodName') as HTMLInputElement)?.value.trim();
+            const price = parseInt((document.getElementById('editFoodPrice') as HTMLInputElement)?.value, 10);
+            const category = (document.getElementById('editFoodCategory') as HTMLSelectElement)?.value;
+            const tag = (document.getElementById('editFoodTag') as HTMLInputElement)?.value.trim() || "";
+            const desc = (document.getElementById('editFoodDesc') as HTMLTextAreaElement)?.value.trim() || "";
+
+            if (!name) {
+                alert("Please enter a valid dish name!");
+                return;
+            }
+            if (!price || isNaN(price) || price <= 0) {
+                alert("Please enter a valid price!");
+                return;
+            }
+
+            const itemIndex = (window.menuItems || []).findIndex(i => String(i.id) === String(id));
+            if (itemIndex === -1) {
+                alert("Dish not found!");
+                return;
+            }
+
+            const saveBtn = document.getElementById('saveEditItemBtn');
+            if (saveBtn) {
+                saveBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Saving...</span>`;
+            }
+
+            window.menuItems[itemIndex].name = name;
+            window.menuItems[itemIndex].price = price;
+            window.menuItems[itemIndex].category = category;
+            window.menuItems[itemIndex].tag = tag;
+            window.menuItems[itemIndex].desc = desc;
+            if (window.editUploadedImageBase64) {
+                window.menuItems[itemIndex].image = window.editUploadedImageBase64;
+            }
+
+            try {
+                localStorage.setItem('binRiazMenuData', JSON.stringify(window.menuItems));
+            } catch(e) {}
+
+            if (typeof window.syncMenuOnline === 'function') {
+                window.syncMenuOnline(window.menuItems);
+            } else if (window.firebaseDB && window.fbSet && window.fbRef) {
+                window.fbSet(window.fbRef(window.firebaseDB, 'binRiazGrill/menu'), window.menuItems);
+            }
+
+            if (saveBtn) {
+                saveBtn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> <span>Save Changes</span>`;
+            }
+
+            window.closeEditMenuItemModal();
+            window.renderFilteredMenu();
+            window.refreshAdminItemsList();
+            window.showToast(`"${name}" updated successfully! 🎉`);
         };
 
         window.publishNewItem = function() {
@@ -1703,9 +2037,14 @@ window.openAdminDashboard = function() {
                             <span class="text-[10px] text-amber-400 font-mono">Rs. ${item.price} • Category: ${item.category}</span>
                         </div>
                     </div>
-                    <button type="button" onclick="window.deleteMenuItem('${item.id}')" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/20 px-2.5 py-1 rounded-lg text-xs font-semibold transition shrink-0 active:scale-95 cursor-pointer flex items-center gap-1">
-                        <i class="fa-solid fa-trash-can"></i> <span>Delete</span>
-                    </button>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button type="button" onclick="window.openEditMenuItemModal('${item.id}')" class="bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-black border border-amber-500/30 px-2 py-1 rounded-lg text-[11px] font-semibold transition shrink-0 active:scale-95 cursor-pointer flex items-center gap-1">
+                            <i class="fa-solid fa-pen-to-square text-[10px]"></i> <span>Edit</span>
+                        </button>
+                        <button type="button" onclick="window.deleteMenuItem('${item.id}')" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/20 px-2 py-1 rounded-lg text-[11px] font-semibold transition shrink-0 active:scale-95 cursor-pointer flex items-center gap-1">
+                            <i class="fa-solid fa-trash-can text-[10px]"></i> <span>Del</span>
+                        </button>
+                    </div>
                 `;
                 container.appendChild(row);
             });
