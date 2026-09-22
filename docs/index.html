@@ -850,25 +850,22 @@
                         </div>
 
                         <div class="sm:col-span-2 space-y-2">
-                            <label class="text-[11px] font-semibold text-gray-400 block">6. Upload Photo (From Gallery, Live Camera, or Image Link)</label>
+                            <label class="text-[11px] font-semibold text-gray-400 block">6. Upload Photo (From Gallery or Live Camera)</label>
                             
-                            <input type="file" id="imageGalleryInput" accept="image/*,image/jpeg,image/png,image/webp,image/jpg" style="display: none;" onchange="handleImageFile(this)">
-                            <input type="file" id="imageCameraInput" accept="image/*,image/jpeg,image/png,image/webp,image/jpg" capture="environment" style="display: none;" onchange="handleImageFile(this)">
-
                             <div class="flex flex-wrap items-center gap-2">
-                                <button type="button" onclick="document.getElementById('imageGalleryInput').click()" class="cursor-pointer bg-neutral-900 hover:bg-neutral-800 text-white border border-white/10 px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-sm">
-                                    <i class="fa-regular fa-image text-amber-400"></i> Pick From Gallery
-                                </button>
+                                <label class="relative cursor-pointer overflow-hidden bg-neutral-900 hover:bg-neutral-800 text-white border border-white/10 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-sm">
+                                    <i class="fa-regular fa-image text-amber-400"></i>
+                                    <span>Pick From Gallery</span>
+                                    <input type="file" id="imageGalleryInput" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20" onchange="window.handleImageFile(this)">
+                                </label>
 
-                                <button type="button" onclick="document.getElementById('imageCameraInput').click()" class="cursor-pointer bg-neutral-900 hover:bg-neutral-800 text-white border border-white/10 px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-sm">
-                                    <i class="fa-solid fa-camera text-red-400"></i> Take Live Photo
-                                </button>
+                                <label class="relative cursor-pointer overflow-hidden bg-neutral-900 hover:bg-neutral-800 text-white border border-white/10 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-sm">
+                                    <i class="fa-solid fa-camera text-red-400"></i>
+                                    <span>Take Live Photo</span>
+                                    <input type="file" id="imageCameraInput" accept="image/*" capture="environment" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20" onchange="window.handleImageFile(this)">
+                                </label>
 
                                 <span id="imageSelectedText" class="text-xs text-gray-500 italic">No image chosen</span>
-                            </div>
-
-                            <div class="flex items-center gap-2 mt-1">
-                                <input type="text" id="newFoodImageUrl" placeholder="Or paste direct image URL (https://...)" class="w-full bg-neutral-950 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-amber-500" oninput="handleImageUrlInput(this.value)">
                             </div>
 
                             <div id="imagePreviewContainer" class="hidden mt-2">
@@ -1027,25 +1024,22 @@
                     </div>
 
                     <div class="sm:col-span-2 space-y-2 border-t border-white/5 pt-3">
-                        <label class="text-[11px] font-semibold text-gray-300 block">6. Change Picture (Gallery, Camera, or Image Link)</label>
+                        <label class="text-[11px] font-semibold text-gray-300 block">6. Change Picture (Gallery or Live Camera)</label>
                         
-                        <input type="file" id="editImageGalleryInput" accept="image/*,image/jpeg,image/png,image/webp,image/jpg" style="display: none;" onchange="handleEditImageFile(this)">
-                        <input type="file" id="editImageCameraInput" accept="image/*,image/jpeg,image/png,image/webp,image/jpg" capture="environment" style="display: none;" onchange="handleEditImageFile(this)">
-
                         <div class="flex flex-wrap items-center gap-2">
-                            <button type="button" onclick="document.getElementById('editImageGalleryInput').click()" class="cursor-pointer bg-neutral-900 hover:bg-neutral-800 text-white border border-white/10 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-sm">
-                                <i class="fa-regular fa-image text-amber-400"></i> Pick From Gallery
-                            </button>
+                            <label class="relative cursor-pointer overflow-hidden bg-neutral-900 hover:bg-neutral-800 text-white border border-white/10 px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-sm">
+                                <i class="fa-regular fa-image text-amber-400"></i>
+                                <span>Pick From Gallery</span>
+                                <input type="file" id="editImageGalleryInput" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20" onchange="window.handleEditImageFile(this)">
+                            </label>
 
-                            <button type="button" onclick="document.getElementById('editImageCameraInput').click()" class="cursor-pointer bg-neutral-900 hover:bg-neutral-800 text-white border border-white/10 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-sm">
-                                <i class="fa-solid fa-camera text-red-400"></i> Take Live Photo
-                            </button>
+                            <label class="relative cursor-pointer overflow-hidden bg-neutral-900 hover:bg-neutral-800 text-white border border-white/10 px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-sm">
+                                <i class="fa-solid fa-camera text-red-400"></i>
+                                <span>Take Live Photo</span>
+                                <input type="file" id="editImageCameraInput" accept="image/*" capture="environment" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20" onchange="window.handleEditImageFile(this)">
+                            </label>
                             
                             <span id="editImageSelectedText" class="text-xs text-gray-400 italic">Current photo active</span>
-                        </div>
-
-                        <div class="flex items-center gap-2 mt-1">
-                            <input type="text" id="editImageUrlInput" placeholder="Or paste direct image URL (https://...)" class="w-full bg-neutral-950 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-amber-500" oninput="handleEditImageUrlInput(this.value)">
                         </div>
 
                         <div id="editImagePreviewContainer" class="mt-2 flex items-center gap-3">

@@ -72,13 +72,26 @@ window.deduplicateOrders = function(orders) {
         const ordId = String(ord.orderId || '');
         if (!ordId || seenIds.has(ordId)) continue;
 
-        // Check if there is an existing order with exact same customer, phone, and total within 90 seconds
+        // Check if there is an existing order that is a duplicate clone
         const isDuplicateClone = cleanList.some(existing => {
             const timeDiff = Math.abs((Number(existing.timestamp) || 0) - (Number(ord.timestamp) || 0));
-            const sameCust = String(existing.customerName || '').trim().toLowerCase() === String(ord.customerName || '').trim().toLowerCase();
-            const samePhone = String(existing.customerPhone || '').replace(/[^0-9]/g, '') === String(ord.customerPhone || '').replace(/[^0-9]/g, '');
+            const custA = String(existing.customerName || '').trim().toLowerCase();
+            const custB = String(ord.customerName || '').trim().toLowerCase();
+            const sameCust = custA && custB && (custA === custB);
+
+            const phoneA = String(existing.customerPhone || '').replace(/^0+/, '').replace(/[^0-9]/g, '');
+            const phoneB = String(ord.customerPhone || '').replace(/^0+/, '').replace(/[^0-9]/g, '');
+            const samePhone = phoneA && phoneB && (phoneA === phoneB);
+
             const sameTotal = Number(existing.totalPayable) === Number(ord.totalPayable);
-            return sameCust && samePhone && sameTotal && timeDiff < 90000;
+
+            // Within 5 minutes (300,000 ms):
+            if (samePhone && sameTotal && timeDiff < 300000) return true;
+            if (sameCust && sameTotal && timeDiff < 300000) return true;
+            if (sameCust && samePhone && timeDiff < 300000) return true;
+            if (existing.slipText && ord.slipText && existing.slipText === ord.slipText && timeDiff < 600000) return true;
+
+            return false;
         });
 
         if (isDuplicateClone) {
@@ -823,10 +836,11 @@ window.syncMenuOnline = function(rawItems) {
             }
             const netTotal = Math.max(0, combinedSubTotal - discountAmt);
 
-            // Anti-clone duplicate check: prevent submitting identical order within 15 seconds
+            // Anti-clone duplicate check: prevent submitting identical order within 30 seconds
             const now = Date.now();
-            const orderSig = `${name.toLowerCase()}_${phone}_${netTotal}`;
-            if (window.lastOrderTime && (now - window.lastOrderTime < 15000) && window.lastOrderSig === orderSig) {
+            const cleanPhone = String(phone).replace(/^0+/, '').replace(/[^0-9]/g, '');
+            const orderSig = `${name.toLowerCase()}_${cleanPhone}_${netTotal}`;
+            if (window.lastOrderTime && (now - window.lastOrderTime < 30000) && window.lastOrderSig === orderSig) {
                 console.warn("Duplicate order submission blocked.");
                 return;
             }
@@ -837,15 +851,17 @@ window.syncMenuOnline = function(rawItems) {
             const checkoutSubmitBtn = document.querySelector('button[onclick="sendOrderViaWhatsApp()"]') as HTMLButtonElement | null;
             if (checkoutSubmitBtn) {
                 checkoutSubmitBtn.disabled = true;
-                checkoutSubmitBtn.classList.add('opacity-70', 'pointer-events-none');
+                checkoutSubmitBtn.style.pointerEvents = 'none';
+                checkoutSubmitBtn.classList.add('opacity-70');
             }
             setTimeout(() => {
                 window.isOrderSubmitting = false;
                 if (checkoutSubmitBtn) {
                     checkoutSubmitBtn.disabled = false;
-                    checkoutSubmitBtn.classList.remove('opacity-70', 'pointer-events-none');
+                    checkoutSubmitBtn.style.pointerEvents = '';
+                    checkoutSubmitBtn.classList.remove('opacity-70');
                 }
-            }, 4000);
+            }, 6000);
 
             const dateNow = new Date().toLocaleString('en-US', { hour12: true });
 
