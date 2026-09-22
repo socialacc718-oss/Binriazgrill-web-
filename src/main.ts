@@ -64,7 +64,7 @@ window.searchQuery = "";
 window.deduplicateOrders = function(orders) {
     if (!Array.isArray(orders)) return [];
     const seenIds = new Set();
-    const cleanList = [];
+    const cleanList: any[] = [];
     const sorted = [...orders].sort((a, b) => (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0));
 
     for (const ord of sorted) {
@@ -74,7 +74,8 @@ window.deduplicateOrders = function(orders) {
 
         // Check if there is an existing order that is a duplicate clone
         const isDuplicateClone = cleanList.some(existing => {
-            const timeDiff = Math.abs((Number(existing.timestamp) || 0) - (Number(ord.timestamp) || 0));
+            if (existing.orderId && ord.orderId && String(existing.orderId) === String(ord.orderId)) return true;
+
             const custA = String(existing.customerName || '').trim().toLowerCase();
             const custB = String(ord.customerName || '').trim().toLowerCase();
             const sameCust = custA && custB && (custA === custB);
@@ -83,19 +84,35 @@ window.deduplicateOrders = function(orders) {
             const phoneB = String(ord.customerPhone || '').replace(/^0+/, '').replace(/[^0-9]/g, '');
             const samePhone = phoneA && phoneB && (phoneA === phoneB);
 
-            const sameTotal = Number(existing.totalPayable) === Number(ord.totalPayable);
+            const totalA = Number(existing.totalPayable);
+            const totalB = Number(ord.totalPayable);
+            const sameTotal = !isNaN(totalA) && !isNaN(totalB) && totalA === totalB;
 
-            // Within 5 minutes (300,000 ms):
-            if (samePhone && sameTotal && timeDiff < 300000) return true;
-            if (sameCust && sameTotal && timeDiff < 300000) return true;
-            if (sameCust && samePhone && timeDiff < 300000) return true;
-            if (existing.slipText && ord.slipText && existing.slipText === ord.slipText && timeDiff < 600000) return true;
+            const timeA = Number(existing.timestamp) || 0;
+            const timeB = Number(ord.timestamp) || 0;
+            const timeDiff = (timeA > 0 && timeB > 0) ? Math.abs(timeA - timeB) : 0;
+
+            const dateA = String(existing.date || '').slice(0, 16);
+            const dateB = String(ord.date || '').slice(0, 16);
+            const sameMinute = dateA && dateB && (dateA === dateB);
+
+            // 1. Identical order slip text
+            if (existing.slipText && ord.slipText && existing.slipText.trim() === ord.slipText.trim()) return true;
+
+            // 2. Same phone AND same total payable (within 15 minutes OR same minute string OR one has no timestamp)
+            if (samePhone && sameTotal && (timeDiff < 900000 || sameMinute || timeA === 0 || timeB === 0)) return true;
+
+            // 3. Same customer name AND same total payable (within 15 minutes OR same minute string OR one has no timestamp)
+            if (sameCust && sameTotal && (timeDiff < 900000 || sameMinute || timeA === 0 || timeB === 0)) return true;
+
+            // 4. Same customer name AND same phone (within 15 minutes OR same minute string)
+            if (sameCust && samePhone && (timeDiff < 900000 || sameMinute)) return true;
 
             return false;
         });
 
         if (isDuplicateClone) {
-            // It's a duplicate clone: remove it from Firebase RTDB as well
+            // It's a duplicate clone: remove it from Firebase RTDB immediately
             try {
                 if (window.firebaseDB && window.fbRemove && window.fbRef) {
                     window.fbRemove(window.fbRef(window.firebaseDB, 'binRiazGrill/orders/' + ordId)).catch(() => {});
@@ -801,19 +818,36 @@ window.syncMenuOnline = function(rawItems) {
                 return;
             }
 
+            const checkoutSubmitBtn = document.querySelector('button[onclick="sendOrderViaWhatsApp()"]') as HTMLButtonElement | null;
+            if (checkoutSubmitBtn) {
+                checkoutSubmitBtn.disabled = true;
+                checkoutSubmitBtn.style.pointerEvents = 'none';
+                checkoutSubmitBtn.classList.add('opacity-70');
+            }
+
             if (window.cart.length === 0) {
                 alert("Please add at least 1 item or deal to your order!");
+                if (checkoutSubmitBtn) {
+                    checkoutSubmitBtn.disabled = false;
+                    checkoutSubmitBtn.style.pointerEvents = '';
+                    checkoutSubmitBtn.classList.remove('opacity-70');
+                }
                 return;
             }
 
-            const name = document.getElementById('custName').value.trim();
-            const phone = document.getElementById('custPhone').value.trim();
-            const address = document.getElementById('custAddress').value.trim();
-            const notesEl = document.getElementById('custNotes');
+            const name = (document.getElementById('custName') as HTMLInputElement).value.trim();
+            const phone = (document.getElementById('custPhone') as HTMLInputElement).value.trim();
+            const address = (document.getElementById('custAddress') as HTMLTextAreaElement).value.trim();
+            const notesEl = document.getElementById('custNotes') as HTMLTextAreaElement | null;
             const notes = notesEl ? notesEl.value.trim() : "";
 
             if (!name || !phone || !address) {
                 alert("Please fill in your Name, Phone Number, and Delivery Address / Table Number.");
+                if (checkoutSubmitBtn) {
+                    checkoutSubmitBtn.disabled = false;
+                    checkoutSubmitBtn.style.pointerEvents = '';
+                    checkoutSubmitBtn.classList.remove('opacity-70');
+                }
                 return;
             }
 
@@ -836,24 +870,31 @@ window.syncMenuOnline = function(rawItems) {
             }
             const netTotal = Math.max(0, combinedSubTotal - discountAmt);
 
-            // Anti-clone duplicate check: prevent submitting identical order within 30 seconds
+            // Anti-clone duplicate check: prevent submitting identical order within 60 seconds
             const now = Date.now();
             const cleanPhone = String(phone).replace(/^0+/, '').replace(/[^0-9]/g, '');
             const orderSig = `${name.toLowerCase()}_${cleanPhone}_${netTotal}`;
-            if (window.lastOrderTime && (now - window.lastOrderTime < 30000) && window.lastOrderSig === orderSig) {
+
+            const sessionLastSig = sessionStorage.getItem('binRiazLastOrderSig');
+            const sessionLastTime = Number(sessionStorage.getItem('binRiazLastOrderTime') || 0);
+            if ((window.lastOrderSig === orderSig && now - (window.lastOrderTime || 0) < 60000) ||
+                (sessionLastSig === orderSig && now - sessionLastTime < 60000)) {
                 console.warn("Duplicate order submission blocked.");
+                window.isOrderSubmitting = false;
+                if (checkoutSubmitBtn) {
+                    checkoutSubmitBtn.disabled = false;
+                    checkoutSubmitBtn.style.pointerEvents = '';
+                    checkoutSubmitBtn.classList.remove('opacity-70');
+                }
                 return;
             }
+
             window.lastOrderTime = now;
             window.lastOrderSig = orderSig;
+            sessionStorage.setItem('binRiazLastOrderSig', orderSig);
+            sessionStorage.setItem('binRiazLastOrderTime', String(now));
             window.isOrderSubmitting = true;
 
-            const checkoutSubmitBtn = document.querySelector('button[onclick="sendOrderViaWhatsApp()"]') as HTMLButtonElement | null;
-            if (checkoutSubmitBtn) {
-                checkoutSubmitBtn.disabled = true;
-                checkoutSubmitBtn.style.pointerEvents = 'none';
-                checkoutSubmitBtn.classList.add('opacity-70');
-            }
             setTimeout(() => {
                 window.isOrderSubmitting = false;
                 if (checkoutSubmitBtn) {
@@ -915,8 +956,9 @@ window.syncMenuOnline = function(rawItems) {
             slip += `*📍 Kitchen Location:* Jinnah Center, Near Pakiza Cash & Carry, Jinnah Garden, Islamabad.\n`;
             slip += `_Please confirm my order as soon as possible! Thank you!_`;
 
-            // Cloud Sync Order to Firebase RTDB
-            const orderId = 'ORD-' + now;
+            // Cloud Sync Order to Firebase RTDB with deterministic ID to guarantee no duplicate clones
+            const minuteBucket = Math.floor(now / 60000);
+            const orderId = 'ORD-' + (cleanPhone ? cleanPhone.slice(-4) : '0000') + '-' + minuteBucket;
             const orderRecord = {
                 orderId: orderId,
                 timestamp: now,
@@ -938,24 +980,36 @@ window.syncMenuOnline = function(rawItems) {
                 status: 'placed'
             };
 
-            try {
-                if (window.firebaseDB && window.fbRef && window.fbSet) {
-                    window.fbSet(window.fbRef(window.firebaseDB, 'binRiazGrill/orders/' + orderId), orderRecord)
-                        .catch(function(err) { console.warn('Order sync note:', err); });
-                }
-            } catch (e) {
-                console.warn('Order sync error:', e);
-            }
+            // Check if already in adminOrders locally
+            const alreadyRecorded = (window.adminOrders || []).some(existing => {
+                if (existing.orderId === orderId) return true;
+                const custA = String(existing.customerName || '').trim().toLowerCase();
+                const phA = String(existing.customerPhone || '').replace(/^0+/, '').replace(/[^0-9]/g, '');
+                const totA = Number(existing.totalPayable);
+                const tA = Number(existing.timestamp) || 0;
+                return (phA === cleanPhone || custA === name.toLowerCase()) && totA === netTotal && Math.abs(now - tA) < 180000;
+            });
 
-            // Add to local admin orders cache as well with deduplication
-            if (!window.adminOrders) window.adminOrders = [];
-            window.adminOrders.unshift(orderRecord);
-            window.adminOrders = window.deduplicateOrders(window.adminOrders);
-            try {
-                localStorage.setItem('binRiazOrders', JSON.stringify(window.adminOrders));
-            } catch(e) {}
-            if (typeof window.renderAdminOrders === 'function') {
-                window.renderAdminOrders();
+            if (!alreadyRecorded) {
+                try {
+                    if (window.firebaseDB && window.fbRef && window.fbSet) {
+                        window.fbSet(window.fbRef(window.firebaseDB, 'binRiazGrill/orders/' + orderId), orderRecord)
+                            .catch(function(err) { console.warn('Order sync note:', err); });
+                    }
+                } catch (e) {
+                    console.warn('Order sync error:', e);
+                }
+
+                // Add to local admin orders cache as well with deduplication
+                if (!window.adminOrders) window.adminOrders = [];
+                window.adminOrders.unshift(orderRecord);
+                window.adminOrders = window.deduplicateOrders(window.adminOrders);
+                try {
+                    localStorage.setItem('binRiazOrders', JSON.stringify(window.adminOrders));
+                } catch(e) {}
+                if (typeof window.renderAdminOrders === 'function') {
+                    window.renderAdminOrders();
+                }
             }
 
             startDeliveryCountdown();
