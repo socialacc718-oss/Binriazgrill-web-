@@ -212,57 +212,117 @@ window.syncMenuOnline = function(rawItems) {
 
 
         const defaultMenuItems = [
+            // ⚡ Value Deals (1 - 5)
             { id: "deal-1", name: "DEALS-1 (Jumbo Roll Special)", category: "deals", price: 500, desc: "1 Jumbo Roll Paratha + 2 Sauces + 300 ML Drink", tag: "Bestseller", icon: "fa-burger", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80" },
             { id: "deal-2", name: "DEALS-2 (Duo Jumbo)", category: "deals", price: 1000, desc: "2 Jumbo Roll Paratha + 2 Drinks", tag: "Popular", icon: "fa-utensils", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80" },
             { id: "deal-3", name: "DEALS-3 (Buy 5 Get 1 Free)", category: "deals", price: 1999, desc: "5 Roll Paratha + Get 1 Free Roll Paratha", tag: "Value Deal", icon: "fa-gift", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80" },
-            { id: "deal-4", name: "DEALS-4 (Family Feast)", category: "deals", price: 3200, desc: "7 Roll Paratha + Get 2 Free Sauces", tag: "Family", icon: "fa-users", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80" },
+            { id: "deal-4", name: "DEALS-4 (Family Feast)", category: "deals", price: 3200, desc: "7 Roll Paratha + Get 2 Free Sauces", tag: "Family Deal", icon: "fa-users", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80" },
             { id: "deal-5", name: "DEALS-5 (Mega Special)", category: "deals", price: 3999, desc: "10 Roll Paratha Special + Get 2 Jumbo Rolls Free", tag: "Mega Deal", icon: "fa-crown", image: "https://images.unsplash.com/photo-1561758033-d89a9ad46330?auto=format&fit=crop&w=600&q=80" },
-            { id: "desi-tarka", name: "DESI TARKA DEAL", category: "dawat", price: 1200, desc: "Tawa Chicken + 2 Sauces + 3 Malwari Paratha + 1 Special Drink", tag: "Desi Taste", icon: "fa-fire", image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=600&q=80" },
-            { id: "dawat-4-5", name: "DAWAT DESI DEAL (4 to 5 Person)", category: "dawat", price: 2600, desc: "Special Chicken Karahi (Extra Gravy) + Special Boneless Biryani (Matka) + 6 Roti/Naan + 2 Sauce Dips + 1000 ML Drink", tag: "4-5 Person", icon: "fa-bowl-food", image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=600&q=80" },
-            { id: "dawat-6-7", name: "DAWAT DESI DEAL (6 to 7 Person)", category: "dawat", price: 4200, desc: "Chicken Karahi Full (Extra Gravy) + Special BBQ Platter (with rice) + 8 Naan + 2 Special Sauces + Drink", tag: "Grand Feast", icon: "fa-champagne-glasses", image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80" },
+
+            // 🍢 BBQ Platters
             { id: "platter-1", name: "BAR B Q PLATTER (1 Person)", category: "platters", price: 1300, desc: "Malai Boti / Chicken Boti / Behari Boti + Reshmi Kabab + Fried Rice / Malwari Paratha + Special Sauce", tag: "Solo Feast", icon: "fa-drumstick-bite", image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80" },
             { id: "platter-2", name: "BAR B Q PLATTER (2 Person)", category: "platters", price: 2000, desc: "Malai Boti + Shangrila Boti + Chicken Boti + Behari Boti + Reshmi Kabab + Chinese Rice & 2 Malwari Paratha + Special Sauce", tag: "Duo Feast", icon: "fa-drumstick-bite", image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80" },
             { id: "platter-3", name: "BAR B Q PLATTER (3 Person)", category: "platters", price: 3000, desc: "Malai Boti + Shangrila Boti + Behari Boti + Reshmi Kabab + Chicken Boti + Chicken Tikka + Full Chinese Rice & 3 Malwari Paratha + Special Sauce", tag: "Trio Royal", icon: "fa-drumstick-bite", image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80" },
-            { id: "roll-bin-riyaz", name: "Bin Riaz Special Roll (Jumbo)", category: "rolls", price: 450, desc: "Chef's signature charcoal chicken wrapped in freshly prepared crisp Malwari Paratha.", tag: "Must Try", icon: "fa-bread-slice", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80" },
-            { id: "roll-chatni", name: "Chicken Chatni Roll (Jumbo)", category: "rolls", price: 450, desc: "Smoky grilled chicken spiced with authentic spicy mint chutney & onions.", tag: "Spicy", icon: "fa-pepper-hot", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80" },
-            { id: "roll-cheese", name: "Chicken Cheese Roll (Jumbo)", category: "rolls", price: 450, desc: "Loaded with melted mozzarella and cheddar cheese over tender chicken cubes.", tag: "Cheesy", icon: "fa-cheese", image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=600&q=80" },
-            { id: "roll-mayo", name: "Chicken Mayo Roll (Jumbo)", category: "rolls", price: 450, desc: "Creamy garlic mayo tossed with charcoal grilled chicken.", tag: "Kids Fav", icon: "fa-bread-slice", image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=600&q=80" },
-            { id: "roll-malai", name: "Malai Boti Roll (Jumbo)", category: "rolls", price: 450, desc: "Ultra tender boneless chicken infused with mild spices & cream.", tag: "Mild", icon: "fa-bread-slice", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80" },
-            { id: "roll-behari", name: "Behari Kabab Roll (Jumbo)", category: "rolls", price: 450, desc: "Authentic Bihari spiced tender meat roll with smoky flavor.", tag: "Smoky", icon: "fa-bread-slice", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80" },
-            { id: "roll-cheese-paratha", name: "Cheese Paratha (Special)", category: "rolls", price: 800, desc: "Stuffed whole wheat crispy paratha bursting with premium molten cheese.", tag: "Cheese Lover", icon: "fa-circle-dot", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80" },
-            { id: "karahi-chicken-half", name: "Chicken Karahi (Half)", category: "karahi", price: 1150, desc: "Prepared fresh on wok with fresh tomatoes, ginger, green chilies, and pure spices.", tag: "Fresh 30 Min", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=600&q=80" },
-            { id: "karahi-chicken-full", name: "Chicken Karahi (Full)", category: "karahi", price: 2200, desc: "Full wok serving of authentic desi chicken karahi with rich aromatic gravy.", tag: "Fresh 30 Min", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=600&q=80" },
-            { id: "karahi-makhni-half", name: "Chicken Makhni Karahi (Half)", category: "karahi", price: 1350, desc: "Velvety butter gravy prepared with tender chicken and mild aromatic herbs.", tag: "Butter Special", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&w=600&q=80" },
-            { id: "karahi-white-half", name: "Chicken White Karahi (Half)", category: "karahi", price: 1350, desc: "Cream and yogurt base rich white sauce karahi with white pepper.", tag: "Creamy", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=600&q=80" },
-            { id: "karahi-mutton-half", name: "Mutton Karahi (Half)", category: "karahi", price: 2600, desc: "Fresh prime cuts of mutton cooked in traditional desi style.", tag: "Royal Mutton", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1545247181-516773cae754?auto=format&fit=crop&w=600&q=80" },
-            { id: "handi-paneer-reshmi", name: "Paneer Reshmi Handi (Half)", category: "karahi", price: 1300, desc: "Clay pot cooked boneless chicken & paneer chunks in rich gravy.", tag: "Clay Pot Handi", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=600&q=80" },
-            { id: "tikka-chest", name: "Chicken Tikka (Chest Piece)", category: "bbq", price: 450, desc: "Juicy breast piece marinated in spicy Bin Riaz tandoori masala with 2 sauces free.", tag: "Charcoal Hot", icon: "fa-drumstick-bite", image: "https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=600&q=80" },
-            { id: "tikka-leg", name: "Chicken Tikka (Leg Piece)", category: "bbq", price: 400, desc: "Charcoal grilled tender leg quarter with 2 sauces free.", tag: "Charcoal Hot", icon: "fa-drumstick-bite", image: "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=600&q=80" },
-            { id: "bbq-shangrila", name: "Shangrila Boti", category: "bbq", price: 950, desc: "Special skewered tender chicken with Bin Riaz house secret marinade.", tag: "Signature", icon: "fa-fire-flame-curved", image: "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=600&q=80" },
-            { id: "bbq-malai-boti", name: "Malai Boti Plate", category: "bbq", price: 900, desc: "Melt in mouth boneless chicken boti grilled to perfection over embers.", tag: "Tender", icon: "fa-fire-flame-curved", image: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=600&q=80" },
-            { id: "bbq-reshmi-kabab", name: "Reshmi Kabab Plate", category: "bbq", price: 850, desc: "Fine minced chicken skewers seasoned with mild saffron spices & butter.", tag: "Chef Special", icon: "fa-fire-flame-curved", image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80" },
-            { id: "matka-biryani-half", name: "Special Matka Biryani (Boneless Half)", category: "chinese", price: 1250, desc: "Dum pukht fragrant basmati rice loaded with boneless marinated chicken + Free Raita.", tag: "Matka Dum", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80" },
-            { id: "chowmein-special", name: "Bin Riaz Special Chow Mein", category: "chinese", price: 1000, desc: "Stir-fried noodles with chicken strips, crunchy vegetables, and signature sauces.", tag: "Wok Tossed", icon: "fa-utensils", image: "https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&w=600&q=80" },
-            { id: "chicken-chili-rice", name: "Chicken Chili with Rice", category: "chinese", price: 950, desc: "Spicy wok chicken chili paired with delicious egg fried rice.", tag: "Oriental", icon: "fa-bowl-food", image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=600&q=80" },
-            { id: "naan-cheese", name: "Cheese Naan", category: "tandoor", price: 499, desc: "Fresh tandoori naan overflowing with gooey cheese.", tag: "Hot", icon: "fa-circle", image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80" },
-            { id: "naan-roghni", name: "Roghni Naan", category: "tandoor", price: 80, desc: "Traditional sesame seed garnished butter-glazed tandoori naan.", tag: "Classic", icon: "fa-circle", image: "https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?auto=format&fit=crop&w=600&q=80" },
-            { id: "malwari-paratha", name: "Malwari Paratha", category: "tandoor", price: 70, desc: "Layered, crispy and golden fried Malwari style paratha.", tag: "Crispy", icon: "fa-circle", image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=600&q=80" },
-            { id: "naan-plain", name: "Plain Naan / Roti", category: "tandoor", price: 30, desc: "Freshly baked clay oven tandoori bread.", tag: "Fresh", icon: "fa-circle", image: "https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?auto=format&fit=crop&w=600&q=80" }
+            { id: "platter-family", name: "Bin Riaz Royal Platter (6 Person)", category: "platters", price: 5500, desc: "Full Chicken Tikka + Shangrilla Boti + Malai Boti + Reshmi Kababs + Mutton Chops + Large Chinese Fried Rice + 6 Malwari Parathas + Chutney & Salad", tag: "Grand Royal", icon: "fa-champagne-glasses", image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80" },
+
+            // 🔥 Charcoal BBQ & Tikka
+            { id: "bbq-shangrila", name: "Chicken Shangrilla Boti", category: "bbq", price: 950, desc: "Special skewered tender chicken with Bin Riaz house secret marinade.", tag: "Signature", icon: "fa-fire-flame-curved", image: "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=600&q=80" },
+            { id: "bbq-malai", name: "Chicken Malai Boti", category: "bbq", price: 900, desc: "Melt in mouth boneless chicken boti grilled to perfection over embers.", tag: "Tender Mild", icon: "fa-fire-flame-curved", image: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=600&q=80" },
+            { id: "bbq-behari", name: "Chicken Behari Boti", category: "bbq", price: 850, desc: "Tender chicken cuts marinated in rich Bihari spice blend.", tag: "Smoky Bihari", icon: "fa-fire-flame-curved", image: "https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=600&q=80" },
+            { id: "bbq-green", name: "Chicken Green Boti", category: "bbq", price: 850, desc: "Fresh coriander, mint and green chili infused charcoal chicken skewers.", tag: "Herbal Spicy", icon: "fa-pepper-hot", image: "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=600&q=80" },
+            { id: "bbq-namkeen", name: "Chicken Namkeen Boti", category: "bbq", price: 850, desc: "Traditional salt and black pepper grilled chicken boti.", tag: "Namkeen", icon: "fa-drumstick-bite", image: "https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=600&q=80" },
+            { id: "bbq-reshmi", name: "Chicken Reshmi Kabab (4 Pcs)", category: "bbq", price: 850, desc: "Fine minced chicken skewers seasoned with saffron spices & butter.", tag: "Chef Special", icon: "fa-fire-flame-curved", image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80" },
+            { id: "bbq-beef-seekh", name: "Beef Seekh Kabab (4 Pcs)", category: "bbq", price: 800, desc: "Spicy prime minced beef kabab charcoal grilled to perfection.", tag: "Desi Beef", icon: "fa-fire-flame-curved", image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80" },
+            { id: "bbq-beef-behari", name: "Beef Behari Boti", category: "bbq", price: 950, desc: "Traditional melt-in-mouth beef fillets with authentic Bihari masala.", tag: "Tender Beef", icon: "fa-fire-flame-curved", image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80" },
+            { id: "bbq-tikka-chest", name: "Chicken Tikka (Chest Piece)", category: "bbq", price: 450, desc: "Juicy breast piece marinated in spicy Bin Riaz tandoori masala with 2 sauces free.", tag: "Charcoal Hot", icon: "fa-drumstick-bite", image: "https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=600&q=80" },
+            { id: "bbq-tikka-leg", name: "Chicken Tikka (Leg Piece)", category: "bbq", price: 400, desc: "Charcoal grilled tender leg quarter with 2 sauces free.", tag: "Charcoal Hot", icon: "fa-drumstick-bite", image: "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=600&q=80" },
+            { id: "bbq-mutton-chops", name: "Mutton Chops (5 Pcs)", category: "bbq", price: 1600, desc: "Juicy prime mutton ribs grilled over charcoal with secret spices.", tag: "Prime Mutton", icon: "fa-drumstick-bite", image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80" },
+
+            // 🌯 Roll Parathas
+            { id: "roll-special", name: "Bin Riaz Special Jumbo Roll", category: "rolls", price: 450, desc: "Chef's signature charcoal chicken wrapped in freshly prepared crisp Malwari Paratha.", tag: "Must Try", icon: "fa-bread-slice", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80" },
+            { id: "roll-zinger", name: "Chicken Zinger Roll", category: "rolls", price: 450, desc: "Crispy crunchy zinger fillet wrapped with lettuce & special sauce in paratha.", tag: "Crunchy", icon: "fa-bread-slice", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80" },
+            { id: "roll-malai", name: "Chicken Malai Boti Roll", category: "rolls", price: 450, desc: "Ultra tender boneless chicken infused with mild spices & cream.", tag: "Mild", icon: "fa-bread-slice", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80" },
+            { id: "roll-behari", name: "Chicken Behari Roll", category: "rolls", price: 450, desc: "Authentic Bihari spiced tender chicken roll with smoky flavor.", tag: "Smoky", icon: "fa-bread-slice", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80" },
+            { id: "roll-green", name: "Chicken Green Roll", category: "rolls", price: 450, desc: "Spicy mint and green herb marinated charcoal chicken in crispy paratha.", tag: "Spicy", icon: "fa-pepper-hot", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80" },
+            { id: "roll-reshmi", name: "Chicken Reshmi Kabab Roll", category: "rolls", price: 450, desc: "Juicy chicken reshmi kabab rolled with onions and mint sauce.", tag: "Juicy", icon: "fa-bread-slice", image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=600&q=80" },
+            { id: "roll-cheese", name: "Chicken Cheese Roll", category: "rolls", price: 500, desc: "Loaded with melted mozzarella and cheddar cheese over tender chicken cubes.", tag: "Cheesy", icon: "fa-cheese", image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=600&q=80" },
+            { id: "roll-mayo", name: "Chicken Mayo Garlic Roll", category: "rolls", price: 450, desc: "Creamy garlic mayo tossed with charcoal grilled chicken.", tag: "Creamy", icon: "fa-bread-slice", image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=600&q=80" },
+            { id: "roll-beef-seekh", name: "Beef Seekh Kabab Roll", category: "rolls", price: 450, desc: "Tender beef kabab wrapped in flaky golden paratha with tangy chutney.", tag: "Desi Beef", icon: "fa-bread-slice", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80" },
+            { id: "roll-cheese-paratha", name: "Special Cheese Paratha", category: "rolls", price: 800, desc: "Stuffed whole wheat crispy paratha bursting with premium molten cheese.", tag: "Cheese Lover", icon: "fa-circle-dot", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80" },
+
+            // 🍲 Desi Karahi
+            { id: "karahi-chicken-half", name: "Chicken Karahi (Half)", category: "karahi", price: 1150, desc: "Prepared fresh in wok with tomatoes, ginger, green chilies & pure spices.", tag: "Fresh 30 Min", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=600&q=80" },
+            { id: "karahi-chicken-full", name: "Chicken Karahi (Full)", category: "karahi", price: 2200, desc: "Full wok serving of authentic desi chicken karahi with rich aromatic gravy.", tag: "Family Karahi", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=600&q=80" },
+            { id: "karahi-makhni-half", name: "Chicken Makhni Karahi (Half)", category: "karahi", price: 1350, desc: "Velvety butter gravy prepared with tender chicken and mild herbs.", tag: "Butter Special", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&w=600&q=80" },
+            { id: "karahi-white-half", name: "Chicken White Karahi (Half)", category: "karahi", price: 1350, desc: "Cream and yogurt base rich white sauce karahi with crushed white pepper.", tag: "Creamy White", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=600&q=80" },
+            { id: "karahi-green-half", name: "Chicken Green Karahi (Half)", category: "karahi", price: 1300, desc: "Fresh cilantro and green chili aromatic gravy cooked over high flame.", tag: "Green Masala", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=600&q=80" },
+            { id: "karahi-mutton-half", name: "Mutton Karahi (Half)", category: "karahi", price: 2600, desc: "Fresh prime cuts of mutton cooked in traditional desi wok style.", tag: "Royal Mutton", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1545247181-516773cae754?auto=format&fit=crop&w=600&q=80" },
+            { id: "karahi-mutton-full", name: "Mutton Karahi (Full)", category: "karahi", price: 5000, desc: "Full wok of prime tender mutton in authentic Punjabi gravy.", tag: "Grand Mutton", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1545247181-516773cae754?auto=format&fit=crop&w=600&q=80" },
+            { id: "karahi-mutton-white", name: "Mutton White Karahi (Half)", category: "karahi", price: 2700, desc: "Creamy white gravy mutton karahi made with almonds and white pepper.", tag: "White Mutton", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=600&q=80" },
+            { id: "karahi-beef-special", name: "Bin Riaz Beef Special Karahi (Half)", category: "karahi", price: 1600, desc: "Rich beef karahi slow-cooked with roasted spices & ginger julienne.", tag: "Special Beef", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1545247181-516773cae754?auto=format&fit=crop&w=600&q=80" },
+
+            // 🥣 Royal Handi
+            { id: "handi-paneer-reshmi", name: "Chicken Paneer Reshmi Handi (Half)", category: "handi", price: 1350, desc: "Clay pot cooked boneless chicken & paneer chunks in royal silky gravy.", tag: "Clay Pot Royal", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=600&q=80" },
+            { id: "handi-cheese", name: "Chicken Cheese Handi (Half)", category: "handi", price: 1400, desc: "Boneless chicken cooked in clay handi infused with rich mozzarella cheese.", tag: "Cheese Handi", icon: "fa-cheese", image: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=600&q=80" },
+            { id: "handi-makhni", name: "Chicken Makhni Handi (Half)", category: "handi", price: 1300, desc: "Slow-cooked boneless chicken in buttery creamy tomato gravy.", tag: "Butter Handi", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&w=600&q=80" },
+            { id: "handi-white", name: "Chicken White Handi (Half)", category: "handi", price: 1300, desc: "Traditional boneless white handi cooked with cream, yogurt & mild herbs.", tag: "Silky White", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=600&q=80" },
+            { id: "handi-achari", name: "Chicken Achari Handi (Half)", category: "handi", price: 1250, desc: "Tangy pickled spiced boneless chicken in rich handi gravy.", tag: "Desi Achari", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=600&q=80" },
+            { id: "handi-ginger", name: "Chicken Ginger Handi (Half)", category: "handi", price: 1250, desc: "Boneless chicken with abundant ginger julienne and aromatic spices.", tag: "Ginger Aroma", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=600&q=80" },
+            { id: "handi-daal-makhni", name: "Daal Makhni Handi (Half)", category: "handi", price: 850, desc: "Creamy slow-simmered black lentils cooked with butter and cream.", tag: "Vegetarian", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=600&q=80" },
+
+            // 🥡 Chinese Cuisine
+            { id: "chinese-chowmein-special", name: "Bin Riaz Special Chow Mein", category: "chinese", price: 1000, desc: "Stir-fried noodles with chicken strips, crunchy vegetables & signature sauce.", tag: "Wok Special", icon: "fa-utensils", image: "https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&w=600&q=80" },
+            { id: "chinese-chowmein-chicken", name: "Chicken Chow Mein", category: "chinese", price: 850, desc: "Wok-tossed noodles with chicken strips and mixed fresh vegetables.", tag: "Classic", icon: "fa-utensils", image: "https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&w=600&q=80" },
+            { id: "chinese-manchurian", name: "Chicken Manchurian with Fried Rice", category: "chinese", price: 950, desc: "Tender chicken balls in savory red sweet-and-sour garlic sauce with egg rice.", tag: "Popular", icon: "fa-bowl-food", image: "https://images.unsplash.com/photo-1525755662778-989d0524087e?auto=format&fit=crop&w=600&q=80" },
+            { id: "chinese-chili-dry", name: "Chicken Chili Dry with Fried Rice", category: "chinese", price: 950, desc: "Sliced chicken with green chilies, onions & capsicum with egg fried rice.", tag: "Spicy Oriental", icon: "fa-bowl-food", image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=600&q=80" },
+            { id: "chinese-shashlik", name: "Chicken Shashlik with Fried Rice", category: "chinese", price: 950, desc: "Skewered chicken with bell peppers & tomatoes in tangy sauce with rice.", tag: "Tangy Sauce", icon: "fa-bowl-food", image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=600&q=80" },
+            { id: "chinese-rice-egg", name: "Egg Fried Rice", category: "chinese", price: 550, desc: "Wok-tossed fragrant basmati rice with eggs and spring onions.", tag: "Fried Rice", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=600&q=80" },
+            { id: "chinese-rice-chicken", name: "Chicken Fried Rice", category: "chinese", price: 650, desc: "Fried rice loaded with chicken chunks, egg and scallions.", tag: "Chicken Rice", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=600&q=80" },
+
+            // 🍚 Dum Biryani & Rice
+            { id: "biryani-matka", name: "Special Matka Dum Biryani (Boneless)", category: "biryani", price: 1250, desc: "Dum pukht fragrant basmati rice sealed in clay pot with boneless chicken + Free Raita.", tag: "Matka Dum", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80" },
+            { id: "biryani-chilman", name: "Chilman Biryani (Special)", category: "biryani", price: 1100, desc: "Puff pastry covered aromatic chicken dum biryani slow-baked with saffron.", tag: "Chilman Dum", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80" },
+            { id: "biryani-nawabi", name: "Nawabi Chicken Biryani", category: "biryani", price: 900, desc: "Richly spiced royal chicken biryani served with fresh salad & raita.", tag: "Royal Dum", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80" },
+            { id: "biryani-sindhi", name: "Sindhi Chicken Biryani", category: "biryani", price: 800, desc: "Spicy Karachi-Sindhi style biryani with potatoes and juicy chicken.", tag: "Karachi Spicy", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80" },
+
+            // 🥪 Sandwiches & Fast Food
+            { id: "fastfood-sandwich-special", name: "Bin Riaz Special Club Sandwich", category: "fastfood", price: 650, desc: "Triple decker sandwich with grilled chicken, cheese, fried egg & fries.", tag: "Chef Special", icon: "fa-bread-slice", image: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=600&q=80" },
+            { id: "fastfood-sandwich-club", name: "Chicken Club Sandwich", category: "fastfood", price: 550, desc: "Classic toasted club sandwich with chicken filling, mayo & French fries.", tag: "Classic Club", icon: "fa-bread-slice", image: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=600&q=80" },
+            { id: "fastfood-sandwich-cheese", name: "Chicken Grilled Cheese Sandwich", category: "fastfood", price: 600, desc: "Golden toasted sandwich packed with melted cheddar and seasoned chicken.", tag: "Melty Cheese", icon: "fa-cheese", image: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=600&q=80" },
+            { id: "fastfood-burger-zinger", name: "Crispy Zinger Burger", category: "fastfood", price: 500, desc: "Crispy golden chicken fillet with coleslaw and secret sauce in sesame bun.", tag: "Crispy", icon: "fa-burger", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80" },
+
+            // 🫓 Tandoor & Dips
+            { id: "tandoor-naan-cheese", name: "Cheese Naan (Special)", category: "tandoor", price: 499, desc: "Fresh tandoori naan overflowing with gooey molten cheese.", tag: "Hot", icon: "fa-circle", image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80" },
+            { id: "tandoor-naan-garlic", name: "Garlic Naan", category: "tandoor", price: 120, desc: "Tandoori naan topped with roasted garlic butter and fresh cilantro.", tag: "Garlic Butter", icon: "fa-circle", image: "https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?auto=format&fit=crop&w=600&q=80" },
+            { id: "tandoor-naan-roghni", name: "Roghni Naan", category: "tandoor", price: 80, desc: "Traditional sesame seed garnished butter-glazed tandoori naan.", tag: "Classic", icon: "fa-circle", image: "https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?auto=format&fit=crop&w=600&q=80" },
+            { id: "tandoor-naan-kalwanji", name: "Kalwanji Naan", category: "tandoor", price: 80, desc: "Tandoori naan topped with nigella seeds (kalwanji) and pure butter.", tag: "Kalwanji", icon: "fa-circle", image: "https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?auto=format&fit=crop&w=600&q=80" },
+            { id: "tandoor-paratha-malwari", name: "Malwari Paratha", category: "tandoor", price: 70, desc: "Crispy, golden multi-layered Malwari style paratha.", tag: "Crispy", icon: "fa-circle", image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=600&q=80" },
+            { id: "tandoor-naan-plain", name: "Plain Naan / Tandoori Roti", category: "tandoor", price: 30, desc: "Freshly baked clay oven whole wheat roti.", tag: "Fresh", icon: "fa-circle", image: "https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?auto=format&fit=crop&w=600&q=80" },
+            { id: "tandoor-raita-mint", name: "Fresh Mint Raita", category: "tandoor", price: 100, desc: "Refreshing yogurt dip blended with mint, coriander and roasted zeera.", tag: "Mint Dip", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=600&q=80" },
+            { id: "tandoor-sauce-dip", name: "Special Garlic Dip Sauce", category: "tandoor", price: 80, desc: "Bin Riaz signature spicy garlic & mayo dip sauce.", tag: "Special Dip", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=600&q=80" }
         ];
 
+        const CURRENT_MENU_VERSION = 'v2_updated_menu_bin_riaz_2026';
+        const storedVersion = localStorage.getItem('binRiazMenuVersion');
         let storedMenu = null;
-        try {
-            const parsed = JSON.parse(localStorage.getItem('binRiazMenuData') || 'null');
-            if (Array.isArray(parsed) && parsed.length > 0) {
-                storedMenu = parsed;
-            }
-        } catch(e) {}
+
+        if (storedVersion === CURRENT_MENU_VERSION) {
+            try {
+                const parsed = JSON.parse(localStorage.getItem('binRiazMenuData') || 'null');
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    storedMenu = parsed;
+                }
+            } catch(e) {}
+        } else {
+            // Version upgrade: replace cache with the updated menu
+            localStorage.setItem('binRiazMenuVersion', CURRENT_MENU_VERSION);
+            localStorage.removeItem('binRiazMenuData');
+        }
 
         // Ensure every item has its authentic image from defaultMenuItems
         const initialMenu = (storedMenu || [...defaultMenuItems]).map(item => {
             const found = defaultMenuItems.find(d => d.id === item.id);
             if (found && found.image) {
-                // If item has no image or is using a legacy mismatched image
                 if (!item.image || item.image.includes('photo-1541592106381') || item.image.includes('photo-1550547660') || item.image.includes('photo-1627308595229') || item.image.includes('photo-1594041680534') || item.image.includes('photo-1567620832903')) {
                     item.image = found.image;
                 }
@@ -338,7 +398,7 @@ window.syncMenuOnline = function(rawItems) {
         window.setCurrentUserSession = function(user, showToastFlag = true) {
             window.currentUser = user;
             localStorage.setItem('binRiazUser', JSON.stringify(user));
-            const shortName = user.email ? user.email.split('@')[0] : "Member";
+            const shortName = user.username || (user.email ? user.email.split('@')[0] : "Member");
             const btnText = document.getElementById('authBtnText');
             if (btnText) {
                 btnText.innerText = shortName;
@@ -982,7 +1042,8 @@ window.syncMenuOnline = function(rawItems) {
 
         window.toggleAuthModal = function() {
             if (window.currentUser) {
-                if (confirm(`Logged in as ${window.currentUser.email}.\nDo you want to Sign Out?`)) {
+                const displayName = window.currentUser.username || window.currentUser.email;
+                if (confirm(`Logged in as ${displayName}.\nDo you want to Sign Out?`)) {
                     if (window.firebaseAuth && window.signOut) {
                         try {
                             window.signOut(window.firebaseAuth);
@@ -999,26 +1060,42 @@ window.syncMenuOnline = function(rawItems) {
                 }
                 return;
             }
+            const userContainer = document.getElementById('authUsernameContainer');
+            if (userContainer) {
+                userContainer.classList.toggle('hidden', !isSignUpMode);
+            }
             document.getElementById('authModal').classList.toggle('hidden');
         };
 
         window.toggleAuthMode = function() {
             isSignUpMode = !isSignUpMode;
+            const userContainer = document.getElementById('authUsernameContainer');
+            if (userContainer) {
+                userContainer.classList.toggle('hidden', !isSignUpMode);
+            }
             document.getElementById('authModalTitle').innerText = isSignUpMode ? "CREATE MEMBER ACCOUNT" : "MEMBER LOGIN";
             document.getElementById('authSubmitBtn').innerHTML = `<span>${isSignUpMode ? "Register Now" : "Sign In"}</span>`;
             document.getElementById('authSwitchBtn').innerText = isSignUpMode ? "Already have an account? Sign In" : "Don't have an account? Register";
         };
 
         // FIXED AUTHENTICATION SYSTEM:
-        // 1. Users MUST register first with email & password.
+        // 1. Users MUST register first with username, email & password.
         // 2. Unregistered users CANNOT log in (no fake auto-login fallback).
         // 3. Registered accounts are securely stored in persistent local database and Firebase Auth.
         window.handleAuthSubmit = function() {
-            const emailInput = document.getElementById('authEmail');
-            const passwordInput = document.getElementById('authPassword');
-            const email = emailInput.value.trim();
-            const password = passwordInput.value.trim();
-            const submitBtn = document.getElementById('authSubmitBtn');
+            const emailInput = document.getElementById('authEmail') as HTMLInputElement | null;
+            const passwordInput = document.getElementById('authPassword') as HTMLInputElement | null;
+            const usernameInput = document.getElementById('authUsername') as HTMLInputElement | null;
+            const email = emailInput ? emailInput.value.trim() : "";
+            const password = passwordInput ? passwordInput.value.trim() : "";
+            const username = usernameInput ? usernameInput.value.trim() : "";
+            const submitBtn = document.getElementById('authSubmitBtn') as HTMLButtonElement | null;
+
+            if (isSignUpMode && !username) {
+                alert("Baraye meharbani apna Username / Name darj karein.");
+                if (usernameInput) usernameInput.focus();
+                return;
+            }
 
             if (!email || !password) {
                 alert("Please fill in both Email and Password.");
@@ -1038,12 +1115,16 @@ window.syncMenuOnline = function(rawItems) {
             const currentRegisteredUsers = getRegisteredUsers();
             const userIndex = currentRegisteredUsers.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
 
-            submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Processing...</span>`;
-            submitBtn.disabled = true;
+            if (submitBtn) {
+                submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Processing...</span>`;
+                submitBtn.disabled = true;
+            }
 
             const resetBtn = () => {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = `<span>${isSignUpMode ? "Register Now" : "Sign In"}</span>`;
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<span>${isSignUpMode ? "Register Now" : "Sign In"}</span>`;
+                }
             };
 
             // ================= MODE 1: REGISTRATION =================
@@ -1052,11 +1133,15 @@ window.syncMenuOnline = function(rawItems) {
                     resetBtn();
                     alert("Yeh email pehle se registered hai! Baraye meharbani 'Sign In' karein.");
                     isSignUpMode = false;
+                    const userContainer = document.getElementById('authUsernameContainer');
+                    if (userContainer) userContainer.classList.add('hidden');
                     document.getElementById('authModalTitle').innerText = "MEMBER LOGIN";
-                    submitBtn.innerHTML = `<span>Sign In</span>`;
+                    if (submitBtn) submitBtn.innerHTML = `<span>Sign In</span>`;
                     document.getElementById('authSwitchBtn').innerText = "Don't have an account? Register";
                     return;
                 }
+
+                const userDisplayName = username || email.split('@')[0];
 
                 // If Firebase Auth is available, create user there
                 if (window.firebaseAuth && window.createUserWithEmailAndPassword) {
@@ -1064,6 +1149,7 @@ window.syncMenuOnline = function(rawItems) {
                         .then((cred) => {
                             // Register in local database
                             currentRegisteredUsers.push({
+                                username: userDisplayName,
                                 email: email.toLowerCase(),
                                 password: password,
                                 uid: cred.user.uid,
@@ -1071,12 +1157,12 @@ window.syncMenuOnline = function(rawItems) {
                             });
                             saveRegisteredUsers(currentRegisteredUsers);
 
-                            
                             // Cloud Sync Registered Account
                             try {
                                 if (window.firebaseDB && window.fbRef && window.fbSet) {
                                     const safeKey = email.toLowerCase().replace(/[.#$\[\]\/]/g, '_');
                                     window.fbSet(window.fbRef(window.firebaseDB, 'binRiazGrill/users/' + safeKey), {
+                                        username: userDisplayName,
                                         email: email.toLowerCase(),
                                         uid: cred.user.uid,
                                         registeredAt: Date.now()
@@ -1092,11 +1178,14 @@ window.syncMenuOnline = function(rawItems) {
 
                             // Switch to sign in mode
                             isSignUpMode = false;
+                            const userContainer = document.getElementById('authUsernameContainer');
+                            if (userContainer) userContainer.classList.add('hidden');
                             document.getElementById('authModalTitle').innerText = "MEMBER LOGIN";
                             document.getElementById('authSwitchBtn').innerText = "Don't have an account? Register";
-                            passwordInput.value = "";
+                            if (passwordInput) passwordInput.value = "";
+                            if (usernameInput) usernameInput.value = "";
                             resetBtn();
-                            alert("Account kamyabi se register ho chuka hai! 🎉\nAb baraye meharbani Login karein.");
+                            alert(`Account kamyabi se register ho chuka hai, ${userDisplayName}! 🎉\nAb baraye meharbani Login karein.`);
                             window.showToast("Registration Successful! Please Sign In.", "success");
                         })
                         .catch((err) => {
@@ -1104,14 +1193,17 @@ window.syncMenuOnline = function(rawItems) {
                                 resetBtn();
                                 alert("Yeh email pehle se registered hai! Baraye meharbani Sign In karein.");
                                 isSignUpMode = false;
+                                const userContainer = document.getElementById('authUsernameContainer');
+                                if (userContainer) userContainer.classList.add('hidden');
                                 document.getElementById('authModalTitle').innerText = "MEMBER LOGIN";
-                                submitBtn.innerHTML = `<span>Sign In</span>`;
+                                if (submitBtn) submitBtn.innerHTML = `<span>Sign In</span>`;
                                 document.getElementById('authSwitchBtn').innerText = "Don't have an account? Register";
                                 return;
                             }
 
                             // Fallback to local registration store if Firebase domain/network issue
                             currentRegisteredUsers.push({
+                                username: userDisplayName,
                                 email: email.toLowerCase(),
                                 password: password,
                                 uid: "local-" + Date.now(),
@@ -1120,16 +1212,20 @@ window.syncMenuOnline = function(rawItems) {
                             saveRegisteredUsers(currentRegisteredUsers);
 
                             isSignUpMode = false;
+                            const userContainer = document.getElementById('authUsernameContainer');
+                            if (userContainer) userContainer.classList.add('hidden');
                             document.getElementById('authModalTitle').innerText = "MEMBER LOGIN";
                             document.getElementById('authSwitchBtn').innerText = "Don't have an account? Register";
-                            passwordInput.value = "";
+                            if (passwordInput) passwordInput.value = "";
+                            if (usernameInput) usernameInput.value = "";
                             resetBtn();
-                            alert("Account kamyabi se register ho chuka hai! 🎉\nAb baraye meharbani Login karein.");
+                            alert(`Account kamyabi se register ho chuka hai, ${userDisplayName}! 🎉\nAb baraye meharbani Login karein.`);
                             window.showToast("Registration Successful! Please Sign In.", "success");
                         });
                 } else {
                     // Local registration
                     currentRegisteredUsers.push({
+                        username: userDisplayName,
                         email: email.toLowerCase(),
                         password: password,
                         uid: "local-" + Date.now(),
@@ -1138,11 +1234,14 @@ window.syncMenuOnline = function(rawItems) {
                     saveRegisteredUsers(currentRegisteredUsers);
 
                     isSignUpMode = false;
+                    const userContainer = document.getElementById('authUsernameContainer');
+                    if (userContainer) userContainer.classList.add('hidden');
                     document.getElementById('authModalTitle').innerText = "MEMBER LOGIN";
                     document.getElementById('authSwitchBtn').innerText = "Don't have an account? Register";
-                    passwordInput.value = "";
+                    if (passwordInput) passwordInput.value = "";
+                    if (usernameInput) usernameInput.value = "";
                     resetBtn();
-                    alert("Account kamyabi se register ho chuka hai! 🎉\nAb baraye meharbani Login karein.");
+                    alert(`Account kamyabi se register ho chuka hai, ${userDisplayName}! 🎉\nAb baraye meharbani Login karein.`);
                     window.showToast("Registration Successful! Please Sign In.", "success");
                 }
             } 
@@ -1153,9 +1252,10 @@ window.syncMenuOnline = function(rawItems) {
                     window.signInWithEmailAndPassword(window.firebaseAuth, email, password)
                         .then((cred) => {
                             resetBtn();
-                            // Also ensure stored in registered users
+                            const matchedUser = currentRegisteredUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
                             if (userIndex === -1) {
                                 currentRegisteredUsers.push({
+                                    username: matchedUser?.username || email.split('@')[0],
                                     email: email.toLowerCase(),
                                     password: password,
                                     uid: cred.user.uid,
@@ -1163,10 +1263,14 @@ window.syncMenuOnline = function(rawItems) {
                                 });
                                 saveRegisteredUsers(currentRegisteredUsers);
                             }
-                            window.setCurrentUserSession({ email: cred.user.email, uid: cred.user.uid }, true);
+                            window.setCurrentUserSession({ 
+                                email: cred.user.email, 
+                                username: matchedUser?.username || cred.user.displayName || email.split('@')[0],
+                                uid: cred.user.uid 
+                            }, true);
                             document.getElementById('authModal').classList.add('hidden');
-                            emailInput.value = "";
-                            passwordInput.value = "";
+                            if (emailInput) emailInput.value = "";
+                            if (passwordInput) passwordInput.value = "";
                         })
                         .catch((err) => {
                             // Check if account exists locally
@@ -1174,10 +1278,14 @@ window.syncMenuOnline = function(rawItems) {
                                 const localUser = currentRegisteredUsers[userIndex];
                                 if (localUser.password === password) {
                                     resetBtn();
-                                    window.setCurrentUserSession({ email: localUser.email, uid: localUser.uid }, true);
+                                    window.setCurrentUserSession({ 
+                                        email: localUser.email, 
+                                        username: localUser.username || localUser.email.split('@')[0],
+                                        uid: localUser.uid 
+                                    }, true);
                                     document.getElementById('authModal').classList.add('hidden');
-                                    emailInput.value = "";
-                                    passwordInput.value = "";
+                                    if (emailInput) emailInput.value = "";
+                                    if (passwordInput) passwordInput.value = "";
                                     return;
                                 } else {
                                     resetBtn();
@@ -1210,12 +1318,164 @@ window.syncMenuOnline = function(rawItems) {
                     }
 
                     resetBtn();
-                    window.setCurrentUserSession({ email: localUser.email, uid: localUser.uid }, true);
+                    window.setCurrentUserSession({ 
+                        email: localUser.email, 
+                        username: localUser.username || localUser.email.split('@')[0],
+                        uid: localUser.uid 
+                    }, true);
                     document.getElementById('authModal').classList.add('hidden');
-                    emailInput.value = "";
-                    passwordInput.value = "";
+                    if (emailInput) emailInput.value = "";
+                    if (passwordInput) passwordInput.value = "";
                 }
             }
+        };
+
+        // ================= CUSTOMER REVIEWS CONTROLLER =================
+        window.selectedReviewRating = 5;
+
+        window.setReviewRating = function(rating: number) {
+            window.selectedReviewRating = rating;
+            const picker = document.getElementById('reviewStarPicker');
+            if (!picker) return;
+            const starSpans = picker.querySelectorAll('span');
+            starSpans.forEach((span, index) => {
+                const starVal = index + 1;
+                if (starVal <= rating) {
+                    span.className = "transition hover:scale-125 text-amber-400";
+                    span.innerText = "★";
+                } else {
+                    span.className = "transition hover:scale-125 text-neutral-600";
+                    span.innerText = "★";
+                }
+            });
+        };
+
+        window.openReviewModal = function() {
+            const modal = document.getElementById('reviewModal');
+            if (!modal) return;
+            const authorInput = document.getElementById('reviewAuthorInput') as HTMLInputElement | null;
+            if (authorInput) {
+                if (window.currentUser) {
+                    authorInput.value = window.currentUser.username || (window.currentUser.email ? window.currentUser.email.split('@')[0] : '');
+                } else if (!authorInput.value) {
+                    authorInput.value = '';
+                }
+            }
+            window.setReviewRating(5);
+            modal.classList.remove('hidden');
+        };
+
+        window.closeReviewModal = function() {
+            const modal = document.getElementById('reviewModal');
+            if (modal) modal.classList.add('hidden');
+        };
+
+        window.renderCustomerReviews = function() {
+            const container = document.getElementById('userSubmittedReviewsContainer');
+            if (!container) return;
+            const reviews = window.customerReviews || [];
+            if (reviews.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            const colors = [
+                'bg-amber-500/20 text-amber-400',
+                'bg-red-500/20 text-red-400',
+                'bg-blue-500/20 text-blue-400',
+                'bg-emerald-500/20 text-emerald-400',
+                'bg-purple-500/20 text-purple-400',
+                'bg-cyan-500/20 text-cyan-400'
+            ];
+            container.innerHTML = reviews.map((rev: any, idx: number) => {
+                const colorClass = colors[idx % colors.length];
+                const stars = '★'.repeat(Math.max(1, Math.min(5, rev.rating || 5)));
+                return `
+                    <div class="glass-panel p-4 rounded-2xl border border-amber-500/30 flex flex-col justify-between shadow-lg bg-neutral-900/60 transition hover:border-amber-400/50">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex text-amber-400 text-xs">${stars}</div>
+                                <span class="text-[9px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold uppercase tracking-wider">New</span>
+                            </div>
+                            <p class="text-xs text-gray-200 leading-relaxed italic mb-3">"${escapeHtml(rev.text || '')}"</p>
+                        </div>
+                        <div class="flex items-center gap-2 pt-2 border-t border-white/5">
+                            <div class="w-7 h-7 rounded-full ${colorClass} flex items-center justify-center font-bold text-xs shrink-0">${escapeHtml(rev.initials || 'CU')}</div>
+                            <div class="overflow-hidden">
+                                <h5 class="text-xs font-bold text-white leading-none truncate">${escapeHtml(rev.author || 'Guest')}</h5>
+                                <span class="text-[10px] text-gray-500 truncate block">${escapeHtml(rev.location || 'Islamabad')}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        window.submitCustomerReview = function() {
+            const authorInput = document.getElementById('reviewAuthorInput') as HTMLInputElement | null;
+            const locInput = document.getElementById('reviewLocationInput') as HTMLInputElement | null;
+            const textInput = document.getElementById('reviewTextInput') as HTMLTextAreaElement | null;
+            const submitBtn = document.getElementById('reviewSubmitBtn') as HTMLButtonElement | null;
+
+            const author = authorInput ? authorInput.value.trim() : '';
+            const location = locInput ? locInput.value.trim() : '';
+            const text = textInput ? textInput.value.trim() : '';
+            const rating = window.selectedReviewRating || 5;
+
+            if (!author) {
+                alert('Baraye meharbani apna Name ya Username darj karein!');
+                if (authorInput) authorInput.focus();
+                return;
+            }
+            if (!text) {
+                alert('Baraye meharbani apna review ya comments darj karein!');
+                if (textInput) textInput.focus();
+                return;
+            }
+
+            if (submitBtn) {
+                submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Submitting...</span>`;
+                submitBtn.disabled = true;
+            }
+
+            const words = author.split(/\s+/).filter(Boolean);
+            const initials = (words.length > 1 ? (words[0][0] + words[1][0]) : words[0].slice(0, 2)).toUpperCase();
+
+            const newReview = {
+                id: 'rev-' + Date.now(),
+                author: author,
+                initials: initials,
+                location: location || 'Islamabad',
+                rating: rating,
+                text: text,
+                timestamp: Date.now()
+            };
+
+            if (!window.customerReviews) window.customerReviews = [];
+            window.customerReviews.unshift(newReview);
+
+            try {
+                localStorage.setItem('binRiazCustomerReviews', JSON.stringify(window.customerReviews));
+            } catch(e) {}
+
+            // Cloud sync to Firebase RTDB
+            try {
+                if (window.firebaseDB && window.fbRef && window.fbSet) {
+                    window.fbSet(window.fbRef(window.firebaseDB, 'binRiazGrill/reviews/' + newReview.id), newReview)
+                        .catch(() => {});
+                }
+            } catch(e) {}
+
+            window.renderCustomerReviews();
+            window.closeReviewModal();
+
+            if (textInput) textInput.value = '';
+            if (locInput) locInput.value = '';
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane text-xs"></i> <span>Submit Review</span>`;
+            }
+
+            window.showToast('Shukriya! Aapka review shamil kar diya gaya hai. ⭐', 'success');
         };
 
         window.openAdminPrompt = function() {
@@ -1860,6 +2120,14 @@ window.openAdminDashboard = function() {
             reader.readAsDataURL(file);
         }
 
+        window.triggerFileInput = function(inputId: string) {
+            const inputEl = document.getElementById(inputId) as HTMLInputElement | null;
+            if (inputEl) {
+                inputEl.value = '';
+                inputEl.click();
+            }
+        };
+
         window.handleImageFile = function(input: HTMLInputElement) {
             if (input && input.files && input.files[0]) {
                 processSelectedImage(
@@ -2311,6 +2579,34 @@ try {
   console.warn('Orders listener setup note:', e);
 }
 
+// 7. Realtime Customer Reviews Listener
+try {
+  const reviewsRef = ref(db, 'binRiazGrill/reviews');
+  onValue(reviewsRef, (snapshot) => {
+    if (snapshot.exists()) {
+      const val = snapshot.val();
+      let revsArr: any[] = [];
+      if (Array.isArray(val)) {
+        revsArr = val.filter(Boolean);
+      } else if (val && typeof val === 'object') {
+        revsArr = Object.values(val);
+      }
+      revsArr.sort((a, b) => (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0));
+      window.customerReviews = revsArr;
+      try {
+        localStorage.setItem('binRiazCustomerReviews', JSON.stringify(revsArr));
+      } catch (e) {}
+      if (typeof window.renderCustomerReviews === 'function') {
+        window.renderCustomerReviews();
+      }
+    }
+  }, (err) => {
+    console.warn('Reviews listener note:', err);
+  });
+} catch (e) {
+  console.warn('Reviews listener setup note:', e);
+}
+
 // Ensure initialization runs reliably even if DOM is already parsed
 function runInitialSetup() {
   setTimeout(() => {
@@ -2318,6 +2614,16 @@ function runInitialSetup() {
       window.dismissSplashScreen();
     }
   }, 1200);
+
+  try {
+    const savedRevs = localStorage.getItem('binRiazCustomerReviews');
+    if (savedRevs) {
+      window.customerReviews = JSON.parse(savedRevs);
+    }
+  } catch (e) {}
+  if (typeof window.renderCustomerReviews === 'function') {
+    window.renderCustomerReviews();
+  }
 
   if (window.currentUser && typeof window.setCurrentUserSession === 'function') {
     window.setCurrentUserSession(window.currentUser, false);
