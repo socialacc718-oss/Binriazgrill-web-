@@ -60,9 +60,47 @@ window.signOut = signOut;
 
 // Live Search & Admin Orders State
 window.searchQuery = "";
+
+window.deduplicateOrders = function(orders) {
+    if (!Array.isArray(orders)) return [];
+    const seenIds = new Set();
+    const cleanList = [];
+    const sorted = [...orders].sort((a, b) => (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0));
+
+    for (const ord of sorted) {
+        if (!ord) continue;
+        const ordId = String(ord.orderId || '');
+        if (!ordId || seenIds.has(ordId)) continue;
+
+        // Check if there is an existing order with exact same customer, phone, and total within 90 seconds
+        const isDuplicateClone = cleanList.some(existing => {
+            const timeDiff = Math.abs((Number(existing.timestamp) || 0) - (Number(ord.timestamp) || 0));
+            const sameCust = String(existing.customerName || '').trim().toLowerCase() === String(ord.customerName || '').trim().toLowerCase();
+            const samePhone = String(existing.customerPhone || '').replace(/[^0-9]/g, '') === String(ord.customerPhone || '').replace(/[^0-9]/g, '');
+            const sameTotal = Number(existing.totalPayable) === Number(ord.totalPayable);
+            return sameCust && samePhone && sameTotal && timeDiff < 90000;
+        });
+
+        if (isDuplicateClone) {
+            // It's a duplicate clone: remove it from Firebase RTDB as well
+            try {
+                if (window.firebaseDB && window.fbRemove && window.fbRef) {
+                    window.fbRemove(window.fbRef(window.firebaseDB, 'binRiazGrill/orders/' + ordId)).catch(() => {});
+                }
+            } catch(e) {}
+            continue;
+        }
+
+        seenIds.add(ordId);
+        cleanList.push(ord);
+    }
+    return cleanList;
+};
+
 window.adminOrders = (function() {
     try {
-        return JSON.parse(localStorage.getItem('binRiazOrders') || '[]');
+        const raw = JSON.parse(localStorage.getItem('binRiazOrders') || '[]');
+        return window.deduplicateOrders(raw);
     } catch(e) {
         return [];
     }
@@ -746,6 +784,10 @@ window.syncMenuOnline = function(rawItems) {
         window.checkDeliveryCountdown = checkDeliveryCountdown;
 
         window.sendOrderViaWhatsApp = function() {
+            if (window.isOrderSubmitting) {
+                return;
+            }
+
             if (window.cart.length === 0) {
                 alert("Please add at least 1 item or deal to your order!");
                 return;
@@ -780,6 +822,31 @@ window.syncMenuOnline = function(rawItems) {
                 discountAmt = Math.round((dishesSubTotal * window.memberDiscountPercent) / 100);
             }
             const netTotal = Math.max(0, combinedSubTotal - discountAmt);
+
+            // Anti-clone duplicate check: prevent submitting identical order within 15 seconds
+            const now = Date.now();
+            const orderSig = `${name.toLowerCase()}_${phone}_${netTotal}`;
+            if (window.lastOrderTime && (now - window.lastOrderTime < 15000) && window.lastOrderSig === orderSig) {
+                console.warn("Duplicate order submission blocked.");
+                return;
+            }
+            window.lastOrderTime = now;
+            window.lastOrderSig = orderSig;
+            window.isOrderSubmitting = true;
+
+            const checkoutSubmitBtn = document.querySelector('button[onclick="sendOrderViaWhatsApp()"]') as HTMLButtonElement | null;
+            if (checkoutSubmitBtn) {
+                checkoutSubmitBtn.disabled = true;
+                checkoutSubmitBtn.classList.add('opacity-70', 'pointer-events-none');
+            }
+            setTimeout(() => {
+                window.isOrderSubmitting = false;
+                if (checkoutSubmitBtn) {
+                    checkoutSubmitBtn.disabled = false;
+                    checkoutSubmitBtn.classList.remove('opacity-70', 'pointer-events-none');
+                }
+            }, 4000);
+
             const dateNow = new Date().toLocaleString('en-US', { hour12: true });
 
             let slip = `*================================*\n`;
@@ -833,42 +900,48 @@ window.syncMenuOnline = function(rawItems) {
             slip += `_Please confirm my order as soon as possible! Thank you!_`;
 
             // Cloud Sync Order to Firebase RTDB
+            const orderId = 'ORD-' + now;
+            const orderRecord = {
+                orderId: orderId,
+                timestamp: now,
+                date: dateNow,
+                customerName: name,
+                customerPhone: phone,
+                deliveryAddress: address,
+                memberEmail: window.currentUser ? window.currentUser.email : null,
+                items: window.cart.map(function(i) { return { id: i.id, name: i.name, price: i.price, qty: i.qty }; }),
+                notes: notes || null,
+                drink: modifiersInfo.drinkName || null,
+                extras: modifiersInfo.extras,
+                spiceLevel: modifiersInfo.spiceLevel,
+                modifiersTotal: modifiersCost,
+                subTotal: dishesSubTotal,
+                discountAmt: discountAmt,
+                totalPayable: netTotal,
+                slipText: slip,
+                status: 'placed'
+            };
+
             try {
                 if (window.firebaseDB && window.fbRef && window.fbSet) {
-                    const orderId = 'ORD-' + Date.now();
-                    const orderRecord = {
-                        orderId: orderId,
-                        timestamp: Date.now(),
-                        date: dateNow,
-                        customerName: name,
-                        customerPhone: phone,
-                        deliveryAddress: address,
-                        memberEmail: window.currentUser ? window.currentUser.email : null,
-                        items: window.cart.map(function(i) { return { id: i.id, name: i.name, price: i.price, qty: i.qty }; }),
-                        notes: notes || null,
-                        drink: modifiersInfo.drinkName || null,
-                        extras: modifiersInfo.extras,
-                        spiceLevel: modifiersInfo.spiceLevel,
-                        modifiersTotal: modifiersCost,
-                        subTotal: dishesSubTotal,
-                        discountAmt: discountAmt,
-                        totalPayable: netTotal,
-                        slipText: slip,
-                        status: 'placed'
-                    };
                     window.fbSet(window.fbRef(window.firebaseDB, 'binRiazGrill/orders/' + orderId), orderRecord)
                         .catch(function(err) { console.warn('Order sync note:', err); });
-                    
-                    // Add to local admin orders cache as well
-                    if (!window.adminOrders) window.adminOrders = [];
-                    window.adminOrders.unshift(orderRecord);
-                    try {
-                        localStorage.setItem('binRiazOrders', JSON.stringify(window.adminOrders));
-                    } catch(e) {}
                 }
             } catch (e) {
                 console.warn('Order sync error:', e);
             }
+
+            // Add to local admin orders cache as well with deduplication
+            if (!window.adminOrders) window.adminOrders = [];
+            window.adminOrders.unshift(orderRecord);
+            window.adminOrders = window.deduplicateOrders(window.adminOrders);
+            try {
+                localStorage.setItem('binRiazOrders', JSON.stringify(window.adminOrders));
+            } catch(e) {}
+            if (typeof window.renderAdminOrders === 'function') {
+                window.renderAdminOrders();
+            }
+
             startDeliveryCountdown();
 
             // Clear Cart & inputs
@@ -1165,6 +1238,9 @@ window.renderAdminOrders = function() {
     const revenueEl = document.getElementById('adminTotalRevenue');
     if (!list) return;
 
+    if (typeof window.deduplicateOrders === 'function') {
+        window.adminOrders = window.deduplicateOrders(window.adminOrders || []);
+    }
     const orders = window.adminOrders || [];
     if (countEl) countEl.innerText = `${orders.length} Orders`;
 
@@ -1695,33 +1771,34 @@ window.openAdminDashboard = function() {
             }
         };
 
-        window.handleImageUrlInput = function(url) {
-            const trimmed = (url || '').trim();
-            if (trimmed) {
-                window.uploadedImageBase64 = trimmed;
-                const previewImg = document.getElementById('imagePreviewImg');
-                const previewContainer = document.getElementById('imagePreviewContainer');
-                const selectedText = document.getElementById('imageSelectedText');
-                if (previewImg) previewImg.src = trimmed;
-                if (previewContainer) previewContainer.classList.remove('hidden');
-                if (selectedText) {
-                    selectedText.innerText = "Web link image attached";
-                    selectedText.className = "text-xs text-green-400 font-semibold";
-                }
-            }
-        };
+        function processSelectedImage(
+            file: File,
+            onSuccess: (dataUrl: string) => void,
+            onStatus: (text: string, isSuccess: boolean) => void
+        ) {
+            if (!file) return;
+            onStatus("Processing selected photo...", false);
 
-        window.handleImageFile = function(input) {
-            if (input && input.files && input.files[0]) {
-                const file = input.files[0];
-                const selectedText = document.getElementById('imageSelectedText');
-                if (selectedText) {
-                    selectedText.innerText = "Processing image...";
-                    selectedText.className = "text-xs text-amber-400 font-semibold";
+            const reader = new FileReader();
+            reader.onerror = function() {
+                onStatus("Could not read photo file", false);
+                window.showToast("Failed to read image file ❌", "error");
+            };
+
+            reader.onload = function(e) {
+                const rawDataUrl = e.target?.result as string;
+                if (!rawDataUrl) {
+                    onStatus("Could not read photo data", false);
+                    return;
                 }
 
-                const reader = new FileReader();
-                reader.onload = function(e) {
+                // 1. Instantly provide image data so preview & submit work immediately
+                onSuccess(rawDataUrl);
+                const displayName = file.name ? (file.name.length > 22 ? file.name.slice(0, 19) + '...' : file.name) : "Photo ready";
+                onStatus(displayName + " ✓", true);
+
+                // 2. Compress image in background to keep Firebase and LocalStorage ultra fast (<180KB)
+                try {
                     const img = new Image();
                     img.onload = function() {
                         try {
@@ -1730,40 +1807,62 @@ window.openAdminDashboard = function() {
                             let height = img.height;
                             const maxDim = 600;
 
-                            if (width > height) {
-                                if (width > maxDim) {
-                                    height = Math.round((height * maxDim) / width);
-                                    width = maxDim;
+                            if (width > 0 && height > 0) {
+                                if (width > height) {
+                                    if (width > maxDim) {
+                                        height = Math.round((height * maxDim) / width);
+                                        width = maxDim;
+                                    }
+                                } else {
+                                    if (height > maxDim) {
+                                        width = Math.round((width * maxDim) / height);
+                                        height = maxDim;
+                                    }
                                 }
-                            } else {
-                                if (height > maxDim) {
-                                    width = Math.round((width * maxDim) / height);
-                                    height = maxDim;
-                                }
-                            }
 
-                            canvas.width = width;
-                            canvas.height = height;
-                            const ctx = canvas.getContext('2d');
-                            if (ctx) {
-                                ctx.drawImage(img, 0, 0, width, height);
-                                window.uploadedImageBase64 = canvas.toDataURL('image/jpeg', 0.75);
-                                const previewImg = document.getElementById('imagePreviewImg');
-                                const previewContainer = document.getElementById('imagePreviewContainer');
-                                if (previewImg) previewImg.src = window.uploadedImageBase64;
-                                if (previewContainer) previewContainer.classList.remove('hidden');
-                                if (selectedText) {
-                                    selectedText.innerText = file.name;
-                                    selectedText.className = "text-xs text-green-400 font-semibold";
+                                canvas.width = width;
+                                canvas.height = height;
+                                const ctx = canvas.getContext('2d');
+                                if (ctx) {
+                                    ctx.drawImage(img, 0, 0, width, height);
+                                    const compressed = canvas.toDataURL('image/jpeg', 0.8);
+                                    if (compressed && compressed.length > 50) {
+                                        onSuccess(compressed);
+                                    }
                                 }
                             }
-                        } catch (err) {
-                            console.warn("Image canvas error:", err);
+                        } catch(canvasErr) {
+                            console.warn("Canvas compression note, using raw image:", canvasErr);
                         }
                     };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
+                    img.src = rawDataUrl;
+                } catch(imgErr) {
+                    console.warn("Image load note:", imgErr);
+                }
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        window.handleImageFile = function(input: HTMLInputElement) {
+            if (input && input.files && input.files[0]) {
+                processSelectedImage(
+                    input.files[0],
+                    function(dataUrl) {
+                        window.uploadedImageBase64 = dataUrl;
+                        const previewImg = document.getElementById('imagePreviewImg') as HTMLImageElement | null;
+                        const previewContainer = document.getElementById('imagePreviewContainer');
+                        if (previewImg) previewImg.src = dataUrl;
+                        if (previewContainer) previewContainer.classList.remove('hidden');
+                    },
+                    function(text, isSuccess) {
+                        const selectedText = document.getElementById('imageSelectedText');
+                        if (selectedText) {
+                            selectedText.innerText = text;
+                            selectedText.className = isSuccess ? "text-xs text-green-400 font-semibold" : "text-xs text-amber-400 font-semibold";
+                        }
+                    }
+                );
             }
         };
 
@@ -1777,23 +1876,21 @@ window.openAdminDashboard = function() {
                 return;
             }
 
-            const idInput = document.getElementById('editItemId');
-            const nameInput = document.getElementById('editFoodName');
-            const catSelect = document.getElementById('editFoodCategory');
-            const priceInput = document.getElementById('editFoodPrice');
-            const tagInput = document.getElementById('editFoodTag');
-            const descInput = document.getElementById('editFoodDesc');
-            const urlInput = document.getElementById('editImageUrlInput');
-            const previewImg = document.getElementById('editImagePreviewImg');
+            const idInput = document.getElementById('editItemId') as HTMLInputElement | null;
+            const nameInput = document.getElementById('editFoodName') as HTMLInputElement | null;
+            const catSelect = document.getElementById('editFoodCategory') as HTMLSelectElement | null;
+            const priceInput = document.getElementById('editFoodPrice') as HTMLInputElement | null;
+            const tagInput = document.getElementById('editFoodTag') as HTMLInputElement | null;
+            const descInput = document.getElementById('editFoodDesc') as HTMLTextAreaElement | null;
+            const previewImg = document.getElementById('editImagePreviewImg') as HTMLImageElement | null;
             const selectedText = document.getElementById('editImageSelectedText');
 
             if (idInput) idInput.value = item.id;
             if (nameInput) nameInput.value = item.name || '';
             if (catSelect) catSelect.value = item.category || 'deals';
-            if (priceInput) priceInput.value = item.price || 0;
+            if (priceInput) priceInput.value = String(item.price || 0);
             if (tagInput) tagInput.value = item.tag || '';
             if (descInput) descInput.value = item.desc || '';
-            if (urlInput) urlInput.value = (item.image && item.image.startsWith('http')) ? item.image : '';
             if (previewImg) previewImg.src = item.image || '';
             if (selectedText) {
                 selectedText.innerText = item.image ? "Active menu picture loaded" : "No picture set";
@@ -1811,71 +1908,23 @@ window.openAdminDashboard = function() {
             window.editUploadedImageBase64 = "";
         };
 
-        window.handleEditImageUrlInput = function(url) {
-            const trimmed = (url || '').trim();
-            if (trimmed) {
-                window.editUploadedImageBase64 = trimmed;
-                const previewImg = document.getElementById('editImagePreviewImg');
-                const selectedText = document.getElementById('editImageSelectedText');
-                if (previewImg) previewImg.src = trimmed;
-                if (selectedText) {
-                    selectedText.innerText = "Web link image attached";
-                    selectedText.className = "text-xs text-green-400 font-semibold";
-                }
-            }
-        };
-
-        window.handleEditImageFile = function(input) {
+        window.handleEditImageFile = function(input: HTMLInputElement) {
             if (input && input.files && input.files[0]) {
-                const file = input.files[0];
-                const selectedText = document.getElementById('editImageSelectedText');
-                if (selectedText) {
-                    selectedText.innerText = "Processing image...";
-                    selectedText.className = "text-xs text-amber-400 font-semibold";
-                }
-
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
-                        try {
-                            const canvas = document.createElement('canvas');
-                            let width = img.width;
-                            let height = img.height;
-                            const maxDim = 600;
-
-                            if (width > height) {
-                                if (width > maxDim) {
-                                    height = Math.round((height * maxDim) / width);
-                                    width = maxDim;
-                                }
-                            } else {
-                                if (height > maxDim) {
-                                    width = Math.round((width * maxDim) / height);
-                                    height = maxDim;
-                                }
-                            }
-
-                            canvas.width = width;
-                            canvas.height = height;
-                            const ctx = canvas.getContext('2d');
-                            if (ctx) {
-                                ctx.drawImage(img, 0, 0, width, height);
-                                window.editUploadedImageBase64 = canvas.toDataURL('image/jpeg', 0.75);
-                                const previewImg = document.getElementById('editImagePreviewImg');
-                                if (previewImg) previewImg.src = window.editUploadedImageBase64;
-                                if (selectedText) {
-                                    selectedText.innerText = file.name;
-                                    selectedText.className = "text-xs text-green-400 font-semibold";
-                                }
-                            }
-                        } catch(err) {
-                            console.warn("Edit image canvas error:", err);
+                processSelectedImage(
+                    input.files[0],
+                    function(dataUrl) {
+                        window.editUploadedImageBase64 = dataUrl;
+                        const previewImg = document.getElementById('editImagePreviewImg') as HTMLImageElement | null;
+                        if (previewImg) previewImg.src = dataUrl;
+                    },
+                    function(text, isSuccess) {
+                        const selectedText = document.getElementById('editImageSelectedText');
+                        if (selectedText) {
+                            selectedText.innerText = text;
+                            selectedText.className = isSuccess ? "text-xs text-green-400 font-semibold" : "text-xs text-amber-400 font-semibold";
                         }
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
+                    }
+                );
             }
         };
 
@@ -2226,8 +2275,11 @@ try {
       } else if (val && typeof val === 'object') {
         ordersArr = Object.values(val);
       }
-      // Sort newest first
-      ordersArr.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+      if (typeof window.deduplicateOrders === 'function') {
+        ordersArr = window.deduplicateOrders(ordersArr);
+      } else {
+        ordersArr.sort((a, b) => (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0));
+      }
       window.adminOrders = ordersArr;
       try {
         localStorage.setItem('binRiazOrders', JSON.stringify(ordersArr));
@@ -2266,6 +2318,16 @@ function runInitialSetup() {
   if (typeof window.renderAdminOrders === 'function') {
     window.renderAdminOrders();
   }
+
+  // Connect file inputs for both Gallery and Camera
+  const gInput = document.getElementById('imageGalleryInput') as HTMLInputElement | null;
+  const cInput = document.getElementById('imageCameraInput') as HTMLInputElement | null;
+  const egInput = document.getElementById('editImageGalleryInput') as HTMLInputElement | null;
+  const ecInput = document.getElementById('editImageCameraInput') as HTMLInputElement | null;
+  if (gInput) gInput.addEventListener('change', () => window.handleImageFile(gInput));
+  if (cInput) cInput.addEventListener('change', () => window.handleImageFile(cInput));
+  if (egInput) egInput.addEventListener('change', () => window.handleEditImageFile(egInput));
+  if (ecInput) ecInput.addEventListener('change', () => window.handleEditImageFile(ecInput));
   const searchInput = document.getElementById('foodSearchInput') as HTMLInputElement | null;
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
