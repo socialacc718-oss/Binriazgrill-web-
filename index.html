@@ -38,10 +38,8 @@
         <div class="absolute w-96 h-96 bg-amber-500/15 rounded-full blur-[140px] pointer-events-none -bottom-10 -right-10"></div>
 
         <div class="relative z-10 flex flex-col items-center">
-            <div class="w-32 h-32 rounded-full border-2 border-amber-500/40 p-2 bg-gradient-to-b from-gray-900 to-black shadow-2xl animate-glow mb-6 flex items-center justify-center">
-                <div class="w-full h-full rounded-full bg-gradient-to-tr from-red-900/60 to-amber-700/40 flex items-center justify-center border border-amber-500/20">
-                    <i class="fa-solid fa-fire-burner text-5xl text-amber-400"></i>
-                </div>
+            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full border-2 border-amber-500/50 p-1.5 bg-black shadow-2xl animate-glow mb-6 flex items-center justify-center overflow-hidden">
+                <img src="./assets/logo.jpg" alt="Bin Riaz Grill Logo" class="w-full h-full object-cover rounded-full shadow-inner" onerror="this.src='./src/assets/images/bin_riaz_logo_1790153868894.jpg'">
             </div>
 
             <h1 class="font-brand text-4xl md:text-6xl font-black tracking-wider uppercase gold-gradient-text drop-shadow-md mb-2 transform transition duration-500">
@@ -175,8 +173,8 @@
     <nav class="sticky top-0 z-50 glass-panel border-b border-white/10 py-2.5 sm:py-3 px-2.5 sm:px-8 w-full shadow-2xl">
         <div class="max-w-7xl mx-auto flex items-center justify-between gap-1.5 sm:gap-4">
             <a href="#" class="flex items-center gap-2 sm:gap-3 group shrink-0">
-                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-red-600 to-amber-500 flex items-center justify-center text-black font-bold shadow-lg shadow-amber-500/20 group-hover:rotate-12 transition duration-300 shrink-0">
-                    <i class="fa-solid fa-utensils text-neutral-950 text-xs sm:text-base"></i>
+                <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-full border border-amber-500/40 p-0.5 bg-black flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-105 transition duration-300 shrink-0 overflow-hidden">
+                    <img src="./assets/logo.jpg" alt="Bin Riaz Grill Logo" class="w-full h-full object-cover rounded-full" onerror="this.src='./src/assets/images/bin_riaz_logo_1790153868894.jpg'">
                 </div>
                 <div class="flex flex-col justify-center shrink-0">
                     <span class="font-brand font-extrabold text-sm sm:text-2xl text-white tracking-wide leading-none whitespace-nowrap">BIN RIAZ</span>
@@ -184,26 +182,21 @@
                 </div>
             </a>
 
-            <div class="flex items-center gap-1 sm:gap-2.5 shrink-0">
-                <button id="authBtn" onclick="toggleAuthModal()" class="bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/10 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-semibold flex items-center gap-1 sm:gap-1.5 transition active:scale-95 shrink-0" title="Member Account">
+            <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+                <button id="authBtn" onclick="toggleAuthModal()" class="bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/10 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shrink-0" title="Member Account">
                     <div class="relative flex items-center justify-center">
                         <i class="fa-regular fa-user text-amber-400 text-xs sm:text-sm"></i>
                         <span id="userOnlineIndicator" class="hidden absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-500 border border-black"></span>
                     </div>
-                    <span id="authBtnText" class="max-w-[48px] sm:max-w-[85px] truncate text-[11px] sm:text-xs">Login</span>
+                    <span id="authBtnText" class="max-w-[75px] sm:max-w-[120px] truncate text-xs">Login</span>
                 </button>
 
-                <button onclick="window.openReviewModal ? window.openReviewModal() : (document.getElementById('reviewModal') && document.getElementById('reviewModal').classList.remove('hidden'))" class="bg-neutral-900/90 hover:bg-neutral-800 text-gray-300 hover:text-amber-400 border border-white/10 px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-xl text-xs font-semibold flex items-center gap-1 transition active:scale-95 shrink-0" title="Customer Reviews & Ratings">
-                    <i class="fa-solid fa-star text-amber-400 text-xs sm:text-sm"></i>
-                    <span class="hidden md:inline">Reviews</span>
-                </button>
-
-                <button onclick="openAdminPrompt()" class="bg-neutral-900/90 hover:bg-neutral-800 text-gray-400 hover:text-amber-400 border border-white/10 w-7 h-7 sm:w-auto sm:px-3 sm:py-2 rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold transition active:scale-95 shrink-0" title="Admin Portal">
+                <button onclick="openAdminPrompt()" class="bg-neutral-900/90 hover:bg-neutral-800 text-gray-400 hover:text-amber-400 border border-white/10 w-8 h-8 sm:w-auto sm:px-3 sm:py-2 rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold transition active:scale-95 shrink-0" title="Admin Portal">
                     <i class="fa-solid fa-user-shield text-amber-500 text-xs sm:text-sm"></i>
                     <span class="hidden sm:inline">Admin</span>
                 </button>
 
-                <button id="mainCartNavBtn" onclick="toggleCartDrawer()" class="relative bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white px-2 sm:px-4 py-1.5 sm:py-2 rounded-xl flex items-center gap-1 sm:gap-2 shadow-lg shadow-red-900/40 transition active:scale-95 shrink-0">
+                <button id="mainCartNavBtn" onclick="toggleCartDrawer()" class="relative bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl flex items-center gap-1.5 sm:gap-2 shadow-lg shadow-red-900/40 transition active:scale-95 shrink-0">
                     <i class="fa-solid fa-bag-shopping text-xs sm:text-base"></i>
                     <span class="font-semibold text-xs hidden sm:inline">Order</span>
                     <span id="cartCountBadge" class="bg-black text-amber-400 font-black text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full border border-amber-400/30 transition-transform">0</span>
