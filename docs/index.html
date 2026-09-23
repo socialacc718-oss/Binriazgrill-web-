@@ -282,16 +282,19 @@
                     🔥 All Items
                 </button>
                 <button onclick="filterCategory('deals')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
-                    ⚡ Value Deals (1 - 5)
+                    ⚡ Value & Dawat Deals
                 </button>
                 <button onclick="filterCategory('platters')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
-                    🍢 BBQ Platters
-                </button>
-                <button onclick="filterCategory('bbq')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
-                    🔥 Charcoal BBQ & Tikka
+                    🍢 Bar BQ Platters
                 </button>
                 <button onclick="filterCategory('rolls')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
                     🌯 Roll Parathas
+                </button>
+                <button onclick="filterCategory('bbq')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
+                    🔥 BBQ Boneless & Tikka
+                </button>
+                <button onclick="filterCategory('kabab')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
+                    🍢 Kabab Lovers
                 </button>
                 <button onclick="filterCategory('karahi')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
                     🍲 Desi Karahi
@@ -299,17 +302,20 @@
                 <button onclick="filterCategory('handi')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
                     🥣 Royal Handi
                 </button>
-                <button onclick="filterCategory('chinese')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
-                    🥡 Chinese Cuisine
-                </button>
                 <button onclick="filterCategory('biryani')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
-                    🍚 Dum Biryani & Rice
+                    🍚 Matka Biryani
                 </button>
                 <button onclick="filterCategory('fastfood')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
-                    🥪 Sandwiches & Fast Food
+                    🍟 Fries & Shawarma
                 </button>
                 <button onclick="filterCategory('tandoor')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
-                    🫓 Tandoor & Dips
+                    🫓 Tandoor
+                </button>
+                <button onclick="filterCategory('raita')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
+                    🥗 Raita & Salad
+                </button>
+                <button onclick="filterCategory('daig')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
+                    🍲 Daig Selection
                 </button>
             </div>
         </div>
@@ -963,16 +969,18 @@
                         <div>
                             <label class="text-[11px] font-semibold text-gray-400 block mb-1">1. Food Category *</label>
                             <select id="newFoodCategory" class="w-full bg-neutral-950 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-                                <option value="deals">⚡ Value Deals (1 - 5)</option>
-                                <option value="platters">🍢 BBQ Platters</option>
-                                <option value="bbq">🔥 Charcoal BBQ & Tikka</option>
+                                <option value="deals">⚡ Value & Dawat Deals</option>
+                                <option value="platters">🍢 Bar BQ Platters</option>
                                 <option value="rolls">🌯 Roll Parathas</option>
+                                <option value="bbq">🔥 BBQ Boneless & Tikka</option>
+                                <option value="kabab">🍢 Kabab Lovers</option>
                                 <option value="karahi">🍲 Desi Karahi</option>
                                 <option value="handi">🥣 Royal Handi</option>
-                                <option value="chinese">🥡 Chinese Cuisine</option>
-                                <option value="biryani">🍚 Dum Biryani & Rice</option>
-                                <option value="fastfood">🥪 Sandwiches & Fast Food</option>
-                                <option value="tandoor">🫓 Tandoor & Dips</option>
+                                <option value="biryani">🍚 Matka Biryani</option>
+                                <option value="fastfood">🍟 Fries & Shawarma</option>
+                                <option value="tandoor">🫓 Tandoor</option>
+                                <option value="raita">🥗 Raita & Salad</option>
+                                <option value="daig">🍲 Daig Selection</option>
                             </select>
                         </div>
 
@@ -1145,16 +1153,18 @@
                     <div>
                         <label class="text-[11px] font-semibold text-gray-400 block mb-1">2. Food Category *</label>
                         <select id="editFoodCategory" class="w-full bg-neutral-950 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-                            <option value="deals">⚡ Value Deals (1 - 5)</option>
-                            <option value="platters">🍢 BBQ Platters</option>
-                            <option value="bbq">🔥 Charcoal BBQ & Tikka</option>
+                            <option value="deals">⚡ Value & Dawat Deals</option>
+                            <option value="platters">🍢 Bar BQ Platters</option>
                             <option value="rolls">🌯 Roll Parathas</option>
+                            <option value="bbq">🔥 BBQ Boneless & Tikka</option>
+                            <option value="kabab">🍢 Kabab Lovers</option>
                             <option value="karahi">🍲 Desi Karahi</option>
                             <option value="handi">🥣 Royal Handi</option>
-                            <option value="chinese">🥡 Chinese Cuisine</option>
-                            <option value="biryani">🍚 Dum Biryani & Rice</option>
-                            <option value="fastfood">🥪 Sandwiches & Fast Food</option>
-                            <option value="tandoor">🫓 Tandoor & Dips</option>
+                            <option value="biryani">🍚 Matka Biryani</option>
+                            <option value="fastfood">🍟 Fries & Shawarma</option>
+                            <option value="tandoor">🫓 Tandoor</option>
+                            <option value="raita">🥗 Raita & Salad</option>
+                            <option value="daig">🍲 Daig Selection</option>
                         </select>
                     </div>
 
