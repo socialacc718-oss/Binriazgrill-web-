@@ -302,9 +302,59 @@ window.syncMenuOnline = function(rawItems) {
             { id: "tandoor-sauce-dip", name: "Special Garlic Dip Sauce", category: "tandoor", price: 80, desc: "Bin Riaz signature spicy garlic & mayo dip sauce.", tag: "Special Dip", icon: "fa-bowl-rice", image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=600&q=80" }
         ];
 
-        const CURRENT_MENU_VERSION = 'v2_updated_menu_bin_riaz_2026';
+        const CURRENT_MENU_VERSION = 'v5_all_authentic_categories_bin_riaz_2026';
         const storedVersion = localStorage.getItem('binRiazMenuVersion');
         let storedMenu = null;
+
+        const ALL_REQUIRED_CATEGORIES = ['deals', 'platters', 'bbq', 'rolls', 'karahi', 'handi', 'chinese', 'biryani', 'fastfood', 'tandoor'];
+
+        function ensureAllCategoriesPopulated(items: any[]): any[] {
+            if (!Array.isArray(items) || items.length === 0) {
+                return [...defaultMenuItems];
+            }
+            let list = [...items];
+            let modified = false;
+
+            for (const cat of ALL_REQUIRED_CATEGORIES) {
+                const countInCat = list.filter(i => i && i.category === cat).length;
+                if (countInCat === 0) {
+                    // Category is missing or empty! Add default authentic dishes for this category
+                    const missingDefaults = defaultMenuItems.filter(d => d.category === cat);
+                    list.push(...missingDefaults);
+                    modified = true;
+                }
+            }
+
+            // Also verify all 5 value deals exist
+            defaultMenuItems.filter(d => d.category === 'deals').forEach(defDeal => {
+                if (!list.some(i => i.id === defDeal.id)) {
+                    list.push(defDeal);
+                    modified = true;
+                }
+            });
+
+            // Ensure images are populated from defaultMenuItems if missing or placeholder
+            list = list.map(item => {
+                const found = defaultMenuItems.find(d => d.id === item.id);
+                if (found && found.image) {
+                    if (!item.image || item.image.includes('photo-1541592106381') || item.image.includes('photo-1550547660') || item.image.includes('photo-1627308595229') || item.image.includes('photo-1594041680534') || item.image.includes('photo-1567620832903')) {
+                        item.image = found.image;
+                    }
+                }
+                return item;
+            });
+
+            if (modified) {
+                try {
+                    localStorage.setItem('binRiazMenuData', JSON.stringify(list));
+                    if (window.syncMenuOnline) {
+                        window.syncMenuOnline(list);
+                    }
+                } catch(e) {}
+            }
+
+            return list;
+        }
 
         if (storedVersion === CURRENT_MENU_VERSION) {
             try {
@@ -319,16 +369,8 @@ window.syncMenuOnline = function(rawItems) {
             localStorage.removeItem('binRiazMenuData');
         }
 
-        // Ensure every item has its authentic image from defaultMenuItems
-        const initialMenu = (storedMenu || [...defaultMenuItems]).map(item => {
-            const found = defaultMenuItems.find(d => d.id === item.id);
-            if (found && found.image) {
-                if (!item.image || item.image.includes('photo-1541592106381') || item.image.includes('photo-1550547660') || item.image.includes('photo-1627308595229') || item.image.includes('photo-1594041680534') || item.image.includes('photo-1567620832903')) {
-                    item.image = found.image;
-                }
-            }
-            return item;
-        });
+        // Ensure every item has its authentic image from defaultMenuItems and all categories exist
+        const initialMenu = ensureAllCategoriesPopulated(storedMenu || [...defaultMenuItems]);
 
         window.menuItems = initialMenu;
         try {
@@ -1060,22 +1102,53 @@ window.syncMenuOnline = function(rawItems) {
                 }
                 return;
             }
-            const userContainer = document.getElementById('authUsernameContainer');
-            if (userContainer) {
-                userContainer.classList.toggle('hidden', !isSignUpMode);
-            }
+            window.setAuthTab(isSignUpMode ? 'register' : 'login');
             document.getElementById('authModal').classList.toggle('hidden');
         };
 
-        window.toggleAuthMode = function() {
-            isSignUpMode = !isSignUpMode;
+        window.setAuthTab = function(mode: 'login' | 'register') {
+            isSignUpMode = (mode === 'register');
             const userContainer = document.getElementById('authUsernameContainer');
+            const tabLogin = document.getElementById('authTabLogin');
+            const tabRegister = document.getElementById('authTabRegister');
+            const title = document.getElementById('authModalTitle');
+            const subtitle = document.getElementById('authModalSubtitle');
+            const submitBtn = document.getElementById('authSubmitBtn');
+            const switchBtn = document.getElementById('authSwitchBtn');
+
             if (userContainer) {
                 userContainer.classList.toggle('hidden', !isSignUpMode);
             }
-            document.getElementById('authModalTitle').innerText = isSignUpMode ? "CREATE MEMBER ACCOUNT" : "MEMBER LOGIN";
-            document.getElementById('authSubmitBtn').innerHTML = `<span>${isSignUpMode ? "Register Now" : "Sign In"}</span>`;
-            document.getElementById('authSwitchBtn').innerText = isSignUpMode ? "Already have an account? Sign In" : "Don't have an account? Register";
+
+            if (isSignUpMode) {
+                if (tabRegister) {
+                    tabRegister.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-amber-500 text-black transition shadow-sm";
+                }
+                if (tabLogin) {
+                    tabLogin.className = "flex-1 py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition";
+                }
+                if (title) title.innerText = "CREATE MEMBER ACCOUNT";
+                if (subtitle) subtitle.innerText = "Register your Name & Email for exclusive member discounts!";
+                if (submitBtn) submitBtn.innerHTML = `<span>Register & Create Account</span>`;
+                if (switchBtn) switchBtn.innerText = "Already have an account? Sign In here";
+                const usernameInput = document.getElementById('authUsername') as HTMLInputElement | null;
+                if (usernameInput) setTimeout(() => usernameInput.focus(), 80);
+            } else {
+                if (tabLogin) {
+                    tabLogin.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-amber-500 text-black transition shadow-sm";
+                }
+                if (tabRegister) {
+                    tabRegister.className = "flex-1 py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition";
+                }
+                if (title) title.innerText = "MEMBER LOGIN";
+                if (subtitle) subtitle.innerText = "Log in to unlock exclusive member discounts!";
+                if (submitBtn) submitBtn.innerHTML = `<span>Sign In</span>`;
+                if (switchBtn) switchBtn.innerText = "Don't have an account? Register new account";
+            }
+        };
+
+        window.toggleAuthMode = function() {
+            window.setAuthTab(isSignUpMode ? 'login' : 'register');
         };
 
         // FIXED AUTHENTICATION SYSTEM:
@@ -2399,7 +2472,7 @@ try {
         items = Object.values(val);
       }
       if (items.length > 0) {
-        window.menuItems = sanitizeMenuItems(items);
+        window.menuItems = ensureAllCategoriesPopulated(sanitizeMenuItems(items));
         try {
           localStorage.setItem('binRiazMenuData', JSON.stringify(window.menuItems));
         } catch (e) {}
@@ -2416,7 +2489,7 @@ try {
       getDoc(doc(firestore, 'binRiazGrill', 'menuData')).then((snap) => {
         if (snap.exists() && snap.data()?.items?.length > 0) {
           const firestoreItems = snap.data().items;
-          window.menuItems = sanitizeMenuItems(firestoreItems);
+          window.menuItems = ensureAllCategoriesPopulated(sanitizeMenuItems(firestoreItems));
           try {
             localStorage.setItem('binRiazMenuData', JSON.stringify(window.menuItems));
           } catch (e) {}
@@ -2448,7 +2521,7 @@ try {
       const data = docSnap.data();
       if (data && Array.isArray(data.items) && data.items.length > 0) {
         if (!window.menuItems || window.menuItems.length !== data.items.length) {
-          window.menuItems = sanitizeMenuItems(data.items);
+          window.menuItems = ensureAllCategoriesPopulated(sanitizeMenuItems(data.items));
           try {
             localStorage.setItem('binRiazMenuData', JSON.stringify(window.menuItems));
           } catch (e) {}

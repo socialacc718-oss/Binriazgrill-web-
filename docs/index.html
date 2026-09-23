@@ -72,6 +72,65 @@
       window.promptDeleteAdminOrder = window.promptDeleteAdminOrder || function(id) { window.pendingDeleteOrderId = id; };
       window.closeDeleteOrderModal = window.closeDeleteOrderModal || function() {};
       window.confirmDeleteAdminOrder = window.confirmDeleteAdminOrder || function() {};
+      window.openReviewModal = window.openReviewModal || function() {
+        var modal = document.getElementById('reviewModal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          var authorInput = document.getElementById('reviewAuthorInput');
+          if (authorInput && window.currentUser) {
+            authorInput.value = window.currentUser.username || window.currentUser.email || '';
+          }
+        }
+      };
+      window.closeReviewModal = window.closeReviewModal || function() {
+        var modal = document.getElementById('reviewModal');
+        if (modal) modal.classList.add('hidden');
+      };
+      window.setReviewRating = window.setReviewRating || function(rating) {
+        window.selectedReviewRating = rating;
+        var picker = document.getElementById('reviewStarPicker');
+        if (!picker) return;
+        var starSpans = picker.querySelectorAll('span');
+        starSpans.forEach(function(span, idx) {
+          span.className = (idx + 1 <= rating) ? "transition hover:scale-125 text-amber-400" : "transition hover:scale-125 text-neutral-600";
+        });
+      };
+      window.isSignUpMode = false;
+      window.setAuthTab = window.setAuthTab || function(mode) {
+        window.isSignUpMode = (mode === 'register');
+        var userContainer = document.getElementById('authUsernameContainer');
+        var tabLogin = document.getElementById('authTabLogin');
+        var tabRegister = document.getElementById('authTabRegister');
+        var title = document.getElementById('authModalTitle');
+        var subtitle = document.getElementById('authModalSubtitle');
+        var submitBtn = document.getElementById('authSubmitBtn');
+        var switchBtn = document.getElementById('authSwitchBtn');
+        if (userContainer) userContainer.classList.toggle('hidden', !window.isSignUpMode);
+        if (tabRegister && tabLogin) {
+          if (window.isSignUpMode) {
+            tabRegister.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-amber-500 text-black transition shadow-sm";
+            tabLogin.className = "flex-1 py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition";
+            if (title) title.innerText = "CREATE MEMBER ACCOUNT";
+            if (subtitle) subtitle.innerText = "Register your Name & Email for exclusive member discounts!";
+            if (submitBtn) submitBtn.innerHTML = "<span>Register & Create Account</span>";
+            if (switchBtn) switchBtn.innerText = "Already have an account? Sign In here";
+          } else {
+            tabLogin.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-amber-500 text-black transition shadow-sm";
+            tabRegister.className = "flex-1 py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition";
+            if (title) title.innerText = "MEMBER LOGIN";
+            if (subtitle) subtitle.innerText = "Log in to unlock exclusive member discounts!";
+            if (submitBtn) submitBtn.innerHTML = "<span>Sign In</span>";
+            if (switchBtn) switchBtn.innerText = "Don't have an account? Register new account";
+          }
+        }
+      };
+      window.toggleAuthModal = window.toggleAuthModal || function() {
+        var modal = document.getElementById('authModal');
+        if (modal) modal.classList.toggle('hidden');
+      };
+      window.toggleAuthMode = window.toggleAuthMode || function() {
+        window.setAuthTab(window.isSignUpMode ? 'login' : 'register');
+      };
 
       (function() {
         function dismissSplashFallback() {
@@ -132,6 +191,11 @@
                         <span id="userOnlineIndicator" class="hidden absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-500 border border-black"></span>
                     </div>
                     <span id="authBtnText" class="max-w-[48px] sm:max-w-[85px] truncate text-[11px] sm:text-xs">Login</span>
+                </button>
+
+                <button onclick="window.openReviewModal ? window.openReviewModal() : (document.getElementById('reviewModal') && document.getElementById('reviewModal').classList.remove('hidden'))" class="bg-neutral-900/90 hover:bg-neutral-800 text-gray-300 hover:text-amber-400 border border-white/10 px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-xl text-xs font-semibold flex items-center gap-1 transition active:scale-95 shrink-0" title="Customer Reviews & Ratings">
+                    <i class="fa-solid fa-star text-amber-400 text-xs sm:text-sm"></i>
+                    <span class="hidden md:inline">Reviews</span>
                 </button>
 
                 <button onclick="openAdminPrompt()" class="bg-neutral-900/90 hover:bg-neutral-800 text-gray-400 hover:text-amber-400 border border-white/10 w-7 h-7 sm:w-auto sm:px-3 sm:py-2 rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold transition active:scale-95 shrink-0" title="Admin Portal">
@@ -227,26 +291,32 @@
                 <button onclick="filterCategory('deals')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
                     ⚡ Value Deals (1 - 5)
                 </button>
-                <button onclick="filterCategory('dawat')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
-                    👑 Dawat & Tarka Deals
-                </button>
                 <button onclick="filterCategory('platters')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
                     🍢 BBQ Platters
+                </button>
+                <button onclick="filterCategory('bbq')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
+                    🔥 Charcoal BBQ & Tikka
                 </button>
                 <button onclick="filterCategory('rolls')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
                     🌯 Roll Parathas
                 </button>
                 <button onclick="filterCategory('karahi')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
-                    🍲 Karahi & Handi
+                    🍲 Desi Karahi
                 </button>
-                <button onclick="filterCategory('bbq')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
-                    🥩 Tikka & BBQ
+                <button onclick="filterCategory('handi')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
+                    🥣 Royal Handi
                 </button>
                 <button onclick="filterCategory('chinese')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
-                    🥡 Chinese & Biryani
+                    🥡 Chinese Cuisine
+                </button>
+                <button onclick="filterCategory('biryani')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
+                    🍚 Dum Biryani & Rice
+                </button>
+                <button onclick="filterCategory('fastfood')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
+                    🥪 Sandwiches & Fast Food
                 </button>
                 <button onclick="filterCategory('tandoor')" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/5">
-                    🫓 Tandoor & Sides
+                    🫓 Tandoor & Dips
                 </button>
             </div>
         </div>
@@ -272,7 +342,8 @@
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div id="customerReviewsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div id="userSubmittedReviewsContainer" class="contents"></div>
                 <div class="glass-panel p-4 rounded-2xl border border-white/5 flex flex-col justify-between">
                     <div>
                         <div class="flex text-amber-400 text-xs mb-2">★★★★★</div>
@@ -448,6 +519,15 @@
                         <div><h5 class="text-xs font-bold text-white leading-none">Waqas Abbasi</h5><span class="text-[10px] text-gray-500">Rawalpindi / ISB</span></div>
                     </div>
                 </div>
+            </div>
+
+            <!-- ================= DROP YOUR REVIEW BUTTON ================= -->
+            <div class="mt-8 text-center">
+                <button type="button" onclick="window.openReviewModal ? window.openReviewModal() : (document.getElementById('reviewModal') && document.getElementById('reviewModal').classList.remove('hidden'))" class="inline-flex items-center gap-2.5 bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-extrabold text-xs sm:text-sm px-6 py-3.5 rounded-2xl shadow-xl shadow-amber-500/25 active:scale-95 transition cursor-pointer">
+                    <i class="fa-solid fa-pen-nib text-black text-sm"></i>
+                    <span>Drop Your Review</span>
+                    <i class="fa-solid fa-star text-xs"></i>
+                </button>
             </div>
         </div>
     </section>
@@ -683,17 +763,38 @@
     <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4">
         <div class="bg-[#12141d] border border-white/10 rounded-2xl w-full max-w-sm p-6 shadow-2xl relative">
             <button onclick="toggleAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <div class="text-center mb-5">
+            <div class="text-center mb-4">
                 <div class="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto mb-2 text-xl">
                     <i class="fa-solid fa-user-check"></i>
                 </div>
                 <h3 id="authModalTitle" class="font-brand text-lg font-bold text-white">MEMBER LOGIN</h3>
-                <p class="text-xs text-gray-400">Log in to unlock exclusive member discounts!</p>
+                <p id="authModalSubtitle" class="text-xs text-gray-400">Log in to unlock exclusive member discounts!</p>
+            </div>
+
+            <!-- Login / Register Tab Switcher -->
+            <div class="flex items-center bg-neutral-950 p-1 rounded-xl border border-white/10 mb-4">
+                <button type="button" id="authTabLogin" onclick="window.setAuthTab('login')" class="flex-1 py-2 text-xs font-bold rounded-lg bg-amber-500 text-black transition shadow-sm">
+                    Sign In
+                </button>
+                <button type="button" id="authTabRegister" onclick="window.setAuthTab('register')" class="flex-1 py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition">
+                    Register New
+                </button>
             </div>
 
             <div class="space-y-3">
-                <input type="email" id="authEmail" placeholder="name@example.com" class="w-full bg-neutral-950 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-amber-500">
-                <input type="password" id="authPassword" placeholder="••••••••" class="w-full bg-neutral-950 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-amber-500">
+                <!-- Username / Full Name container (visible when Registering) -->
+                <div id="authUsernameContainer" class="hidden space-y-1">
+                    <label class="text-[11px] font-semibold text-gray-300 block">Full Name / Username *</label>
+                    <input type="text" id="authUsername" placeholder="e.g. Ali Khan / Ahmed Raza" class="w-full bg-neutral-950 border border-white/10 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[11px] font-semibold text-gray-300 block">Email Address *</label>
+                    <input type="email" id="authEmail" placeholder="name@example.com" class="w-full bg-neutral-950 border border-white/10 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[11px] font-semibold text-gray-300 block">Password *</label>
+                    <input type="password" id="authPassword" placeholder="••••••••" class="w-full bg-neutral-950 border border-white/10 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none">
+                </div>
             </div>
 
             <button id="authSubmitBtn" onclick="handleAuthSubmit()" class="w-full mt-4 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-black font-bold py-2.5 rounded-xl text-xs shadow-lg shadow-amber-500/20 active:scale-95 transition flex items-center justify-center gap-2">
@@ -703,6 +804,57 @@
             <div class="text-center mt-3">
                 <button onclick="toggleAuthMode()" id="authSwitchBtn" class="text-xs text-amber-400 hover:underline">Don't have an account? Register</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ================= DROP YOUR REVIEW MODAL ================= -->
+    <div id="reviewModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4">
+        <div class="bg-[#12141d] border border-white/10 rounded-2xl w-full max-w-sm sm:max-w-md p-6 shadow-2xl relative">
+            <button onclick="window.closeReviewModal()" type="button" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div class="text-center mb-5">
+                <div class="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto mb-2 text-xl">
+                    <i class="fa-solid fa-star"></i>
+                </div>
+                <h3 class="font-brand text-lg font-bold text-white">SHARE YOUR EXPERIENCE</h3>
+                <p class="text-xs text-gray-400">Tell us how you enjoyed Bin Riaz Grill's food and service!</p>
+            </div>
+
+            <div class="space-y-3.5">
+                <!-- Star Rating -->
+                <div>
+                    <label class="text-[11px] font-semibold text-gray-400 block mb-1 text-center">Your Rating</label>
+                    <div id="reviewStarPicker" class="flex items-center justify-center gap-2 text-2xl text-amber-400 cursor-pointer select-none">
+                        <span onclick="window.setReviewRating(1)" data-star="1" class="transition hover:scale-125">★</span>
+                        <span onclick="window.setReviewRating(2)" data-star="2" class="transition hover:scale-125">★</span>
+                        <span onclick="window.setReviewRating(3)" data-star="3" class="transition hover:scale-125">★</span>
+                        <span onclick="window.setReviewRating(4)" data-star="4" class="transition hover:scale-125">★</span>
+                        <span onclick="window.setReviewRating(5)" data-star="5" class="transition hover:scale-125">★</span>
+                    </div>
+                </div>
+
+                <!-- Customer Name / Username -->
+                <div>
+                    <label class="text-[11px] font-semibold text-gray-400 block mb-1">Customer Name / Username *</label>
+                    <input type="text" id="reviewAuthorInput" placeholder="Your name (e.g. Hamza Ali)" class="w-full bg-neutral-950 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-amber-500">
+                </div>
+
+                <!-- Area / Location -->
+                <div>
+                    <label class="text-[11px] font-semibold text-gray-400 block mb-1">Area / Location (Optional)</label>
+                    <input type="text" id="reviewLocationInput" placeholder="e.g. Jinnah Garden, Islamabad" class="w-full bg-neutral-950 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-amber-500">
+                </div>
+
+                <!-- Review Text -->
+                <div>
+                    <label class="text-[11px] font-semibold text-gray-400 block mb-1">Your Review / Comments *</label>
+                    <textarea id="reviewTextInput" rows="3" placeholder="Share details about the taste, packaging, or express delivery..." class="w-full bg-neutral-950 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-amber-500"></textarea>
+                </div>
+            </div>
+
+            <button id="reviewSubmitBtn" onclick="window.submitCustomerReview()" type="button" class="w-full mt-5 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-black font-extrabold py-2.5 rounded-xl text-xs shadow-lg shadow-amber-500/20 active:scale-95 transition flex items-center justify-center gap-2 cursor-pointer">
+                <i class="fa-solid fa-paper-plane text-xs"></i>
+                <span>Submit Review</span>
+            </button>
         </div>
     </div>
 
@@ -819,13 +971,15 @@
                             <label class="text-[11px] font-semibold text-gray-400 block mb-1">1. Food Category *</label>
                             <select id="newFoodCategory" class="w-full bg-neutral-950 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
                                 <option value="deals">⚡ Value Deals (1 - 5)</option>
-                                <option value="dawat">👑 Dawat & Tarka Deals</option>
                                 <option value="platters">🍢 BBQ Platters</option>
+                                <option value="bbq">🔥 Charcoal BBQ & Tikka</option>
                                 <option value="rolls">🌯 Roll Parathas</option>
-                                <option value="karahi">🍲 Karahi & Handi</option>
-                                <option value="bbq">🥩 Tikka & BBQ</option>
-                                <option value="chinese">🥡 Chinese & Biryani</option>
-                                <option value="tandoor">🫓 Tandoor & Sides</option>
+                                <option value="karahi">🍲 Desi Karahi</option>
+                                <option value="handi">🥣 Royal Handi</option>
+                                <option value="chinese">🥡 Chinese Cuisine</option>
+                                <option value="biryani">🍚 Dum Biryani & Rice</option>
+                                <option value="fastfood">🥪 Sandwiches & Fast Food</option>
+                                <option value="tandoor">🫓 Tandoor & Dips</option>
                             </select>
                         </div>
 
@@ -850,20 +1004,21 @@
                         </div>
 
                         <div class="sm:col-span-2 space-y-2">
-                            <label class="text-[11px] font-semibold text-gray-400 block">6. Upload Photo (From Gallery or Live Camera)</label>
+                            <label class="text-[11px] font-semibold text-gray-400 block">6. Upload Dish Photo (Upload Files or Live Camera)</label>
                             
                             <div class="flex flex-wrap items-center gap-2">
-                                <label class="relative cursor-pointer overflow-hidden bg-neutral-900 hover:bg-neutral-800 text-white border border-white/10 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-sm">
-                                    <i class="fa-regular fa-image text-amber-400"></i>
-                                    <span>Pick From Gallery</span>
-                                    <input type="file" id="imageGalleryInput" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20" onchange="window.handleImageFile(this)">
+                                <label for="imageGalleryInput" onclick="window.triggerFileInput('imageGalleryInput')" class="bg-neutral-900 hover:bg-neutral-800 text-white border border-white/10 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-sm cursor-pointer select-none">
+                                    <i class="fa-solid fa-cloud-arrow-up text-amber-400"></i>
+                                    <span>Upload Files</span>
                                 </label>
 
-                                <label class="relative cursor-pointer overflow-hidden bg-neutral-900 hover:bg-neutral-800 text-white border border-white/10 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-sm">
+                                <label for="imageCameraInput" onclick="window.triggerFileInput('imageCameraInput')" class="bg-neutral-900 hover:bg-neutral-800 text-white border border-white/10 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-sm cursor-pointer select-none">
                                     <i class="fa-solid fa-camera text-red-400"></i>
                                     <span>Take Live Photo</span>
-                                    <input type="file" id="imageCameraInput" accept="image/*" capture="environment" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20" onchange="window.handleImageFile(this)">
                                 </label>
+
+                                <input type="file" id="imageGalleryInput" accept="image/*" class="sr-only" onchange="window.handleImageFile(this)">
+                                <input type="file" id="imageCameraInput" accept="image/*" capture="environment" class="sr-only" onchange="window.handleImageFile(this)">
 
                                 <span id="imageSelectedText" class="text-xs text-gray-500 italic">No image chosen</span>
                             </div>
@@ -998,13 +1153,15 @@
                         <label class="text-[11px] font-semibold text-gray-400 block mb-1">2. Food Category *</label>
                         <select id="editFoodCategory" class="w-full bg-neutral-950 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
                             <option value="deals">⚡ Value Deals (1 - 5)</option>
-                            <option value="dawat">👑 Dawat & Tarka Deals</option>
                             <option value="platters">🍢 BBQ Platters</option>
+                            <option value="bbq">🔥 Charcoal BBQ & Tikka</option>
                             <option value="rolls">🌯 Roll Parathas</option>
-                            <option value="karahi">🍲 Karahi & Handi</option>
-                            <option value="bbq">🥩 Tikka & BBQ</option>
-                            <option value="chinese">🥡 Chinese & Biryani</option>
-                            <option value="tandoor">🫓 Tandoor & Sides</option>
+                            <option value="karahi">🍲 Desi Karahi</option>
+                            <option value="handi">🥣 Royal Handi</option>
+                            <option value="chinese">🥡 Chinese Cuisine</option>
+                            <option value="biryani">🍚 Dum Biryani & Rice</option>
+                            <option value="fastfood">🥪 Sandwiches & Fast Food</option>
+                            <option value="tandoor">🫓 Tandoor & Dips</option>
                         </select>
                     </div>
 
@@ -1024,21 +1181,22 @@
                     </div>
 
                     <div class="sm:col-span-2 space-y-2 border-t border-white/5 pt-3">
-                        <label class="text-[11px] font-semibold text-gray-300 block">6. Change Picture (Gallery or Live Camera)</label>
+                        <label class="text-[11px] font-semibold text-gray-300 block">6. Change Picture (Upload Files or Live Camera)</label>
                         
                         <div class="flex flex-wrap items-center gap-2">
-                            <label class="relative cursor-pointer overflow-hidden bg-neutral-900 hover:bg-neutral-800 text-white border border-white/10 px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-sm">
-                                <i class="fa-regular fa-image text-amber-400"></i>
-                                <span>Pick From Gallery</span>
-                                <input type="file" id="editImageGalleryInput" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20" onchange="window.handleEditImageFile(this)">
+                            <label for="editImageGalleryInput" onclick="window.triggerFileInput('editImageGalleryInput')" class="bg-neutral-900 hover:bg-neutral-800 text-white border border-white/10 px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-sm cursor-pointer select-none">
+                                <i class="fa-solid fa-cloud-arrow-up text-amber-400"></i>
+                                <span>Upload Files</span>
                             </label>
 
-                            <label class="relative cursor-pointer overflow-hidden bg-neutral-900 hover:bg-neutral-800 text-white border border-white/10 px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-sm">
+                            <label for="editImageCameraInput" onclick="window.triggerFileInput('editImageCameraInput')" class="bg-neutral-900 hover:bg-neutral-800 text-white border border-white/10 px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 shadow-sm cursor-pointer select-none">
                                 <i class="fa-solid fa-camera text-red-400"></i>
                                 <span>Take Live Photo</span>
-                                <input type="file" id="editImageCameraInput" accept="image/*" capture="environment" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20" onchange="window.handleEditImageFile(this)">
                             </label>
                             
+                            <input type="file" id="editImageGalleryInput" accept="image/*" class="sr-only" onchange="window.handleEditImageFile(this)">
+                            <input type="file" id="editImageCameraInput" accept="image/*" capture="environment" class="sr-only" onchange="window.handleEditImageFile(this)">
+
                             <span id="editImageSelectedText" class="text-xs text-gray-400 italic">Current photo active</span>
                         </div>
 
