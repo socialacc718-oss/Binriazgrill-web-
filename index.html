@@ -93,6 +93,39 @@
           span.className = (idx + 1 <= rating) ? "transition hover:scale-125 text-amber-400" : "transition hover:scale-125 text-neutral-600";
         });
       };
+      window.openAdminPrompt = window.openAdminPrompt || function() {
+        var m = document.getElementById('adminAuthModal');
+        if (m) m.classList.remove('hidden');
+        var inp = document.getElementById('adminPinInput');
+        if (inp) inp.focus();
+      };
+      window.closeAdminPrompt = window.closeAdminPrompt || function() {
+        var m = document.getElementById('adminAuthModal');
+        if (m) m.classList.add('hidden');
+      };
+      window.openAdminDashboard = window.openAdminDashboard || function() {
+        var p = document.getElementById('adminPanelModal');
+        if (p) p.classList.remove('hidden');
+        if (typeof window.refreshAdminItemsList === 'function') window.refreshAdminItemsList();
+      };
+      window.closeAdminPanel = window.closeAdminPanel || function() {
+        var p = document.getElementById('adminPanelModal');
+        if (p) p.classList.add('hidden');
+      };
+      window.openFullMenuManagerModal = window.openFullMenuManagerModal || function() {
+        var m = document.getElementById('adminFullMenuModal');
+        if (m) m.classList.remove('hidden');
+        if (typeof window.renderAdminFullMenuList === 'function') window.renderAdminFullMenuList();
+      };
+      window.closeFullMenuManagerModal = window.closeFullMenuManagerModal || function() {
+        var m = document.getElementById('adminFullMenuModal');
+        if (m) m.classList.add('hidden');
+      };
+      window.handleAdminMenuSearch = window.handleAdminMenuSearch || function() {};
+      window.clearAdminMenuSearch = window.clearAdminMenuSearch || function() {};
+      window.setAdminCategoryFilter = window.setAdminCategoryFilter || function() {};
+      window.refreshAdminItemsList = window.refreshAdminItemsList || function() {};
+      window.renderAdminFullMenuList = window.renderAdminFullMenuList || function() {};
       window.isSignUpMode = false;
       window.setAuthTab = window.setAuthTab || function(mode) {
         window.isSignUpMode = (mode === 'register');
@@ -1041,7 +1074,7 @@
                         <span class="flex items-center gap-2 font-bold text-sm text-white">
                             <i class="fa-solid fa-utensils text-amber-400"></i> Manage & Delete Items
                         </span>
-                        <span id="adminTotalItemsCount" class="text-xs text-amber-400 font-mono font-bold bg-neutral-900 px-2.5 py-1 rounded-lg border border-amber-500/30">0 Dishes</span>
+                        <span id="adminTotalItemsCount" class="text-xs text-amber-400 font-mono font-bold bg-neutral-900 px-2.5 py-1 rounded-lg border border-amber-500/30">72 Dishes</span>
                     </div>
 
                     <p class="text-xs text-gray-400">
@@ -1054,7 +1087,7 @@
                             <span class="tracking-wide">View Full Menu</span>
                         </span>
                         <span class="flex items-center gap-1.5 text-xs bg-black/25 px-2.5 py-1 rounded-lg font-mono">
-                            <span id="adminMenuBtnCount">0 Dishes</span>
+                            <span id="adminMenuBtnCount">72 Dishes</span>
                             <i class="fa-solid fa-arrow-right text-[11px] group-hover:translate-x-0.5 transition-transform"></i>
                         </span>
                     </button>
@@ -1112,7 +1145,7 @@
 
                 <div class="flex items-center gap-2 shrink-0">
                     <span id="adminFullMenuTotalBadge" class="text-xs text-amber-400 font-mono font-bold bg-amber-500/10 border border-amber-500/30 px-2.5 py-1 rounded-lg">
-                        0 Dishes
+                        72 Dishes
                     </span>
                     <button type="button" onclick="window.closeFullMenuManagerModal()" class="w-8 h-8 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-gray-400 hover:text-white flex items-center justify-center border border-white/10 transition cursor-pointer">
                         <i class="fa-solid fa-xmark text-sm"></i>
@@ -1145,13 +1178,13 @@
                 <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-[11px]" id="adminMenuCategoryPills">
                     <button type="button" onclick="window.setAdminCategoryFilter('all')" data-cat="all" class="admin-cat-pill active-cat-pill px-3 py-1 rounded-lg bg-amber-500 text-black font-bold whitespace-nowrap cursor-pointer transition">All</button>
                     <button type="button" onclick="window.setAdminCategoryFilter('deals')" data-cat="deals" class="admin-cat-pill px-3 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/10 whitespace-nowrap cursor-pointer transition">Deals</button>
-                    <button type="button" onclick="window.setAdminCategoryFilter('barbq_platter')" data-cat="barbq_platter" class="admin-cat-pill px-3 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/10 whitespace-nowrap cursor-pointer transition">Platters</button>
+                    <button type="button" onclick="window.setAdminCategoryFilter('platters')" data-cat="platters" class="admin-cat-pill px-3 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/10 whitespace-nowrap cursor-pointer transition">Platters</button>
                     <button type="button" onclick="window.setAdminCategoryFilter('rolls')" data-cat="rolls" class="admin-cat-pill px-3 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/10 whitespace-nowrap cursor-pointer transition">Rolls</button>
                     <button type="button" onclick="window.setAdminCategoryFilter('bbq')" data-cat="bbq" class="admin-cat-pill px-3 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/10 whitespace-nowrap cursor-pointer transition">BBQ & Tikka</button>
                     <button type="button" onclick="window.setAdminCategoryFilter('kabab')" data-cat="kabab" class="admin-cat-pill px-3 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/10 whitespace-nowrap cursor-pointer transition">Kabab</button>
                     <button type="button" onclick="window.setAdminCategoryFilter('karahi')" data-cat="karahi" class="admin-cat-pill px-3 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/10 whitespace-nowrap cursor-pointer transition">Karahi</button>
                     <button type="button" onclick="window.setAdminCategoryFilter('handi')" data-cat="handi" class="admin-cat-pill px-3 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/10 whitespace-nowrap cursor-pointer transition">Handi</button>
-                    <button type="button" onclick="window.setAdminCategoryFilter('matka_biryani')" data-cat="matka_biryani" class="admin-cat-pill px-3 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/10 whitespace-nowrap cursor-pointer transition">Biryani</button>
+                    <button type="button" onclick="window.setAdminCategoryFilter('biryani')" data-cat="biryani" class="admin-cat-pill px-3 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/10 whitespace-nowrap cursor-pointer transition">Biryani</button>
                     <button type="button" onclick="window.setAdminCategoryFilter('fastfood')" data-cat="fastfood" class="admin-cat-pill px-3 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/10 whitespace-nowrap cursor-pointer transition">Fast Food</button>
                     <button type="button" onclick="window.setAdminCategoryFilter('tandoor')" data-cat="tandoor" class="admin-cat-pill px-3 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/10 whitespace-nowrap cursor-pointer transition">Tandoor</button>
                     <button type="button" onclick="window.setAdminCategoryFilter('raita')" data-cat="raita" class="admin-cat-pill px-3 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/10 whitespace-nowrap cursor-pointer transition">Raita</button>

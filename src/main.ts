@@ -2626,11 +2626,14 @@ window.openAdminDashboard = function() {
         };
 
         window.setAdminCategoryFilter = function(category: string) {
-            window.adminMenuSelectedCategory = category || 'all';
+            let catNormalized = category || 'all';
+            if (catNormalized === 'barbq_platter') catNormalized = 'platters';
+            if (catNormalized === 'matka_biryani') catNormalized = 'biryani';
+            window.adminMenuSelectedCategory = catNormalized;
             const pills = document.querySelectorAll('.admin-cat-pill');
             pills.forEach(pill => {
                 const cat = pill.getAttribute('data-cat');
-                if (cat === window.adminMenuSelectedCategory) {
+                if (cat === window.adminMenuSelectedCategory || (cat === 'barbq_platter' && window.adminMenuSelectedCategory === 'platters') || (cat === 'matka_biryani' && window.adminMenuSelectedCategory === 'biryani')) {
                     pill.className = "admin-cat-pill active-cat-pill px-3 py-1 rounded-lg bg-amber-500 text-black font-bold whitespace-nowrap cursor-pointer transition shadow-md shadow-amber-500/20";
                 } else {
                     pill.className = "admin-cat-pill px-3 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/10 whitespace-nowrap cursor-pointer transition";
@@ -2747,9 +2750,12 @@ window.openAdminDashboard = function() {
         window.refreshAdminItemsList = function() {
             const countBadge = document.getElementById('adminTotalItemsCount');
             const btnCountBadge = document.getElementById('adminMenuBtnCount');
+            const fullMenuBadge = document.getElementById('adminFullMenuTotalBadge');
             const listContainer = document.getElementById('adminItemsList');
-            if (countBadge) countBadge.innerText = `${(window.menuItems || []).length} Dishes`;
-            if (btnCountBadge) btnCountBadge.innerText = `${(window.menuItems || []).length} Dishes`;
+            const currentCount = (window.menuItems && window.menuItems.length > 0) ? window.menuItems.length : defaultMenuItems.length;
+            if (countBadge) countBadge.innerText = `${currentCount} Dishes`;
+            if (btnCountBadge) btnCountBadge.innerText = `${currentCount} Dishes`;
+            if (fullMenuBadge) fullMenuBadge.innerText = `${currentCount} Dishes`;
             if (listContainer) listContainer.innerHTML = "";
             if (typeof window.renderAdminFullMenuList === 'function') {
                 window.renderAdminFullMenuList();
@@ -2787,6 +2793,10 @@ try {
             setDoc(doc(firestore, 'binRiazGrill', 'menuData'), { items: window.menuItems, updatedAt: new Date().toISOString() }, { merge: true }).catch(() => {});
           } catch(e) {}
         }
+      } else {
+        window.menuItems = ensureAllCategoriesPopulated([...defaultMenuItems]);
+        if (typeof window.renderFilteredMenu === 'function') window.renderFilteredMenu();
+        if (typeof window.refreshAdminItemsList === 'function') window.refreshAdminItemsList();
       }
     } else {
       // RTDB menu node is empty: check Firestore first before seeding defaults
@@ -2813,6 +2823,11 @@ try {
     }
   }, (err) => {
     console.warn('Realtime Database listener note:', err);
+    if (!window.menuItems || window.menuItems.length === 0) {
+      window.menuItems = ensureAllCategoriesPopulated([...defaultMenuItems]);
+      if (typeof window.renderFilteredMenu === 'function') window.renderFilteredMenu();
+      if (typeof window.refreshAdminItemsList === 'function') window.refreshAdminItemsList();
+    }
   });
 } catch (e) {
   console.warn('Realtime Database listener setup note:', e);
@@ -3016,6 +3031,9 @@ function runInitialSetup() {
   }
   if (typeof window.renderAdminOrders === 'function') {
     window.renderAdminOrders();
+  }
+  if (typeof window.refreshAdminItemsList === 'function') {
+    window.refreshAdminItemsList();
   }
 
   // Connect file inputs for both Gallery and Camera
