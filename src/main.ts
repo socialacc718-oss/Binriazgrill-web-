@@ -1257,6 +1257,30 @@ window.syncMenuOnline = function(rawItems) {
             window.setAuthTab(isSignUpMode ? 'login' : 'register');
         };
 
+        function triggerPasswordHeadShake(element: HTMLElement | null) {
+            if (!element) return;
+            element.classList.remove('password-head-shake', 'password-spin-exit');
+            void element.offsetWidth; // re-trigger animation
+            element.classList.add('password-head-shake');
+            setTimeout(() => {
+                element.classList.remove('password-head-shake');
+            }, 700);
+        }
+
+        function triggerPasswordSpinExit(element: HTMLElement | null, onComplete: () => void) {
+            if (!element) {
+                onComplete();
+                return;
+            }
+            element.classList.remove('password-head-shake', 'password-spin-exit');
+            void element.offsetWidth;
+            element.classList.add('password-spin-exit');
+            setTimeout(() => {
+                element.classList.remove('password-spin-exit');
+                onComplete();
+            }, 580);
+        }
+
         // FIXED AUTHENTICATION SYSTEM:
         // 1. Users MUST register first with username, email & password.
         // 2. Unregistered users CANNOT log in (no fake auto-login fallback).
@@ -1269,6 +1293,7 @@ window.syncMenuOnline = function(rawItems) {
             const password = passwordInput ? passwordInput.value.trim() : "";
             const username = usernameInput ? usernameInput.value.trim() : "";
             const submitBtn = document.getElementById('authSubmitBtn') as HTMLButtonElement | null;
+            const authCard = document.getElementById('authModalCard');
 
             if (isSignUpMode && !username) {
                 alert("Baraye meharbani apna Username / Name darj karein.");
@@ -1447,9 +1472,11 @@ window.syncMenuOnline = function(rawItems) {
                                 username: matchedUser?.username || cred.user.displayName || email.split('@')[0],
                                 uid: cred.user.uid 
                             }, true);
-                            document.getElementById('authModal').classList.add('hidden');
-                            if (emailInput) emailInput.value = "";
-                            if (passwordInput) passwordInput.value = "";
+                            triggerPasswordSpinExit(authCard, () => {
+                                document.getElementById('authModal')?.classList.add('hidden');
+                                if (emailInput) emailInput.value = "";
+                                if (passwordInput) passwordInput.value = "";
+                            });
                         })
                         .catch((err) => {
                             // Check if account exists locally
@@ -1462,12 +1489,15 @@ window.syncMenuOnline = function(rawItems) {
                                         username: localUser.username || localUser.email.split('@')[0],
                                         uid: localUser.uid 
                                     }, true);
-                                    document.getElementById('authModal').classList.add('hidden');
-                                    if (emailInput) emailInput.value = "";
-                                    if (passwordInput) passwordInput.value = "";
+                                    triggerPasswordSpinExit(authCard, () => {
+                                        document.getElementById('authModal')?.classList.add('hidden');
+                                        if (emailInput) emailInput.value = "";
+                                        if (passwordInput) passwordInput.value = "";
+                                    });
                                     return;
                                 } else {
                                     resetBtn();
+                                    triggerPasswordHeadShake(authCard);
                                     alert("Galat Password! Baraye meharbani sahi password darj karein.");
                                     window.showToast("Incorrect password!", "error");
                                     return;
@@ -1476,6 +1506,7 @@ window.syncMenuOnline = function(rawItems) {
 
                             // If not in Firebase AND not in local database:
                             resetBtn();
+                            triggerPasswordHeadShake(authCard);
                             alert("Aapka account register nahi hai!\nPehle 'Register' par click karke account banayein, phir login karein.");
                             window.showToast("Account not found! Please register first.", "error");
                         });
@@ -1483,6 +1514,7 @@ window.syncMenuOnline = function(rawItems) {
                     // No Firebase - verify against local database
                     if (userIndex === -1) {
                         resetBtn();
+                        triggerPasswordHeadShake(authCard);
                         alert("Aapka account register nahi hai!\nPehle 'Register' par click karke account banayein, phir login karein.");
                         window.showToast("Account not found! Please register first.", "error");
                         return;
@@ -1491,6 +1523,7 @@ window.syncMenuOnline = function(rawItems) {
                     const localUser = currentRegisteredUsers[userIndex];
                     if (localUser.password !== password) {
                         resetBtn();
+                        triggerPasswordHeadShake(authCard);
                         alert("Galat Password! Baraye meharbani sahi password darj karein.");
                         window.showToast("Incorrect password!", "error");
                         return;
@@ -1502,9 +1535,11 @@ window.syncMenuOnline = function(rawItems) {
                         username: localUser.username || localUser.email.split('@')[0],
                         uid: localUser.uid 
                     }, true);
-                    document.getElementById('authModal').classList.add('hidden');
-                    if (emailInput) emailInput.value = "";
-                    if (passwordInput) passwordInput.value = "";
+                    triggerPasswordSpinExit(authCard, () => {
+                        document.getElementById('authModal')?.classList.add('hidden');
+                        if (emailInput) emailInput.value = "";
+                        if (passwordInput) passwordInput.value = "";
+                    });
                 }
             }
         };
@@ -1668,19 +1703,28 @@ window.syncMenuOnline = function(rawItems) {
         };
 
         window.verifyAdminPass = function() {
-            const pinInput = document.getElementById('adminPinInput');
+            const pinInput = document.getElementById('adminPinInput') as HTMLInputElement | null;
             const entered = (pinInput?.value || '').trim();
             const storedPin = String(localStorage.getItem('binRiazAdminPin') || '').trim();
             const memoryPin = String(window.currentAdminPin || '').trim();
             const fallbackPin = "00123";
+            const validPins = [memoryPin, storedPin, fallbackPin].filter(Boolean);
 
-            if (entered === memoryPin || entered === storedPin || entered === fallbackPin) {
-                window.closeAdminPrompt();
-                window.openAdminDashboard();
-                if (pinInput) pinInput.value = "";
+            const authCard = document.getElementById('adminAuthCard');
+
+            if (entered && validPins.includes(entered)) {
+                triggerPasswordSpinExit(authCard, () => {
+                    window.closeAdminPrompt();
+                    window.openAdminDashboard();
+                    if (pinInput) pinInput.value = "";
+                });
             } else {
+                triggerPasswordHeadShake(authCard);
                 window.showToast("Unauthorized! Incorrect Admin PIN ❌", "error");
-                if (pinInput) pinInput.value = "";
+                if (pinInput) {
+                    pinInput.value = "";
+                    pinInput.focus();
+                }
             }
         };
 
@@ -2048,7 +2092,10 @@ window.confirmDeleteAdminOrder = function() {
     const fallbackPin = "00123";
     const validPins = [memoryPin, storedPin, fallbackPin].filter(Boolean);
 
+    const deleteCard = document.getElementById('deleteOrderAuthCard');
+
     if (!entered || !validPins.includes(entered)) {
+        triggerPasswordHeadShake(deleteCard);
         window.showToast("Ghalat Admin Password! ❌", "error");
         if (input) {
             input.value = "";
@@ -2063,24 +2110,26 @@ window.confirmDeleteAdminOrder = function() {
         return;
     }
 
-    // 1. Remove from in-memory array
-    window.adminOrders = (window.adminOrders || []).filter(o => o.orderId !== orderId);
+    triggerPasswordSpinExit(deleteCard, () => {
+        // 1. Remove from in-memory array
+        window.adminOrders = (window.adminOrders || []).filter(o => o.orderId !== orderId);
 
-    // 2. Persist in localStorage
-    try {
-        localStorage.setItem('binRiazOrders', JSON.stringify(window.adminOrders));
-    } catch(e) {}
+        // 2. Persist in localStorage
+        try {
+            localStorage.setItem('binRiazOrders', JSON.stringify(window.adminOrders));
+        } catch(e) {}
 
-    // 3. Remove from Firebase Realtime Database
-    try {
-        if (window.firebaseDB && window.fbRef && window.fbRemove) {
-            window.fbRemove(window.fbRef(window.firebaseDB, 'binRiazGrill/orders/' + orderId)).catch(() => {});
-        }
-    } catch(e) {}
+        // 3. Remove from Firebase Realtime Database
+        try {
+            if (window.firebaseDB && window.fbRef && window.fbRemove) {
+                window.fbRemove(window.fbRef(window.firebaseDB, 'binRiazGrill/orders/' + orderId)).catch(() => {});
+            }
+        } catch(e) {}
 
-    window.closeDeleteOrderModal();
-    window.renderAdminOrders();
-    window.showToast("Order record deleted successfully! 🗑️");
+        window.closeDeleteOrderModal();
+        window.renderAdminOrders();
+        window.showToast("Order record deleted successfully! 🗑️");
+    });
 };
 
 window.openAdminDashboard = function() {
@@ -2149,6 +2198,7 @@ window.openAdminDashboard = function() {
             const validPins = [memoryPin, storedPin, fallbackPin].filter(Boolean);
 
             if (currentPass && !validPins.includes(currentPass)) {
+                triggerPasswordHeadShake(currentPassEl as HTMLElement | null);
                 window.showToast("Current password ghalat hai!", "error");
                 if (currentPassEl) currentPassEl.focus();
                 return;
@@ -2530,36 +2580,180 @@ window.openAdminDashboard = function() {
             window.showToast(`"${deletedItemName}" deleted successfully! 🗑️`, "success");
         };
 
-        window.refreshAdminItemsList = function() {
-            const container = document.getElementById('adminItemsList');
-            const countBadge = document.getElementById('adminTotalItemsCount');
-            if(!container || !countBadge) return;
+        window.adminMenuSearchQuery = "";
+        window.adminMenuSelectedCategory = "all";
 
-            countBadge.innerText = `${window.menuItems.length} Dishes`;
-            container.innerHTML = "";
+        window.openFullMenuManagerModal = function() {
+            const modal = document.getElementById('adminFullMenuModal');
+            if (modal) modal.classList.remove('hidden');
+            window.adminMenuSearchQuery = "";
+            const searchInput = document.getElementById('adminMenuSearchInput') as HTMLInputElement | null;
+            if (searchInput) {
+                searchInput.value = "";
+                setTimeout(() => searchInput.focus(), 100);
+            }
+            const clearBtn = document.getElementById('adminMenuSearchClearBtn');
+            if (clearBtn) clearBtn.classList.add('hidden');
+            window.setAdminCategoryFilter('all');
+            window.renderAdminFullMenuList();
+        };
 
-            window.menuItems.forEach(item => {
-                const row = document.createElement('div');
-                row.className = "py-2.5 flex items-center justify-between gap-3 border-b border-white/5 last:border-0";
-                row.innerHTML = `
-                    <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                        ${item.image ? `<img src="${item.image}" class="w-8 h-8 rounded-lg object-cover border border-white/10 shrink-0">` : `<div class="w-8 h-8 rounded-lg bg-neutral-900 flex items-center justify-center text-amber-400 text-xs shrink-0"><i class="fa-solid ${item.icon || 'fa-utensils'}"></i></div>`}
-                        <div class="min-w-0 flex-1">
-                            <h5 class="text-xs font-bold text-white truncate">${item.name}</h5>
-                            <span class="text-[10px] text-amber-400 font-mono">Rs. ${item.price} • Category: ${item.category}</span>
+        window.closeFullMenuManagerModal = function() {
+            const modal = document.getElementById('adminFullMenuModal');
+            if (modal) modal.classList.add('hidden');
+        };
+
+        window.handleAdminMenuSearch = function(query: string) {
+            window.adminMenuSearchQuery = (query || '').toLowerCase().trim();
+            const clearBtn = document.getElementById('adminMenuSearchClearBtn');
+            if (clearBtn) {
+                if (window.adminMenuSearchQuery) {
+                    clearBtn.classList.remove('hidden');
+                } else {
+                    clearBtn.classList.add('hidden');
+                }
+            }
+            window.renderAdminFullMenuList();
+        };
+
+        window.clearAdminMenuSearch = function() {
+            const searchInput = document.getElementById('adminMenuSearchInput') as HTMLInputElement | null;
+            if (searchInput) {
+                searchInput.value = "";
+                searchInput.focus();
+            }
+            window.handleAdminMenuSearch("");
+        };
+
+        window.setAdminCategoryFilter = function(category: string) {
+            window.adminMenuSelectedCategory = category || 'all';
+            const pills = document.querySelectorAll('.admin-cat-pill');
+            pills.forEach(pill => {
+                const cat = pill.getAttribute('data-cat');
+                if (cat === window.adminMenuSelectedCategory) {
+                    pill.className = "admin-cat-pill active-cat-pill px-3 py-1 rounded-lg bg-amber-500 text-black font-bold whitespace-nowrap cursor-pointer transition shadow-md shadow-amber-500/20";
+                } else {
+                    pill.className = "admin-cat-pill px-3 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-gray-300 border border-white/10 whitespace-nowrap cursor-pointer transition";
+                }
+            });
+            window.renderAdminFullMenuList();
+        };
+
+        window.renderAdminFullMenuList = function() {
+            const container = document.getElementById('adminFullMenuItemsList');
+            const totalBadge = document.getElementById('adminFullMenuTotalBadge');
+            const statusText = document.getElementById('adminMenuFilterStatusText');
+            const mainCountBadge = document.getElementById('adminTotalItemsCount');
+            const menuBtnCount = document.getElementById('adminMenuBtnCount');
+
+            const allItems = window.menuItems || [];
+            if (mainCountBadge) mainCountBadge.innerText = `${allItems.length} Dishes`;
+            if (menuBtnCount) menuBtnCount.innerText = `${allItems.length} Dishes`;
+
+            if (!container) return;
+
+            const q = window.adminMenuSearchQuery || '';
+            const selectedCat = window.adminMenuSelectedCategory || 'all';
+
+            const filtered = allItems.filter(item => {
+                if (selectedCat !== 'all' && item.category !== selectedCat) {
+                    return false;
+                }
+                if (q) {
+                    const matchName = item.name && item.name.toLowerCase().includes(q);
+                    const matchCat = item.category && item.category.toLowerCase().includes(q);
+                    const matchPrice = String(item.price).includes(q);
+                    const matchTag = item.tag && item.tag.toLowerCase().includes(q);
+                    const matchDesc = item.desc && item.desc.toLowerCase().includes(q);
+                    return matchName || matchCat || matchPrice || matchTag || matchDesc;
+                }
+                return true;
+            });
+
+            if (totalBadge) {
+                totalBadge.innerText = `${filtered.length} of ${allItems.length} Dishes`;
+            }
+
+            if (statusText) {
+                if (q && selectedCat !== 'all') {
+                    statusText.innerText = `Search "${q}" in ${selectedCat.toUpperCase()} (${filtered.length} found)`;
+                } else if (q) {
+                    statusText.innerText = `Search results for "${q}" (${filtered.length} found)`;
+                } else if (selectedCat !== 'all') {
+                    statusText.innerText = `Filtered by category: ${selectedCat.toUpperCase()} (${filtered.length} dishes)`;
+                } else {
+                    statusText.innerText = `Showing all ${allItems.length} menu dishes`;
+                }
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="py-16 text-center text-gray-500 flex flex-col items-center justify-center">
+                        <div class="w-14 h-14 rounded-full bg-neutral-900 border border-white/10 flex items-center justify-center text-amber-400 text-xl mb-3">
+                            <i class="fa-solid fa-magnifying-glass"></i>
                         </div>
-                    </div>
-                    <div class="flex items-center gap-1.5 shrink-0">
-                        <button type="button" onclick="window.openEditMenuItemModal('${item.id}')" class="bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-black border border-amber-500/30 px-2 py-1 rounded-lg text-[11px] font-semibold transition shrink-0 active:scale-95 cursor-pointer flex items-center gap-1">
-                            <i class="fa-solid fa-pen-to-square text-[10px]"></i> <span>Edit</span>
-                        </button>
-                        <button type="button" onclick="window.deleteMenuItem('${item.id}')" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/20 px-2 py-1 rounded-lg text-[11px] font-semibold transition shrink-0 active:scale-95 cursor-pointer flex items-center gap-1">
-                            <i class="fa-solid fa-trash-can text-[10px]"></i> <span>Del</span>
+                        <h4 class="text-sm font-bold text-white mb-1">No Matching Dishes Found</h4>
+                        <p class="text-xs text-gray-400 max-w-xs mb-4">"${q || selectedCat}" se koi dish match nahi hui. Baraye meharbani search ya category badal kar try karein.</p>
+                        <button type="button" onclick="window.clearAdminMenuSearch(); window.setAdminCategoryFilter('all');" class="bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-black border border-amber-500/30 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer">
+                            Reset Search & Show All
                         </button>
                     </div>
                 `;
-                container.appendChild(row);
+                return;
+            }
+
+            container.innerHTML = "";
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "p-3 bg-neutral-950/70 hover:bg-neutral-900/80 border border-white/5 hover:border-amber-500/30 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition group";
+                
+                const categoryLabel = (item.category || '').toUpperCase().replace('_', ' ');
+                const tagBadge = item.tag ? `<span class="inline-block bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] px-1.5 py-0.5 rounded-md font-semibold">${item.tag}</span>` : '';
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-3 min-w-0 flex-1">
+                        ${item.image 
+                            ? `<img src="${item.image}" alt="${item.name}" class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover border border-white/10 shrink-0 shadow-md">` 
+                            : `<div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-neutral-900 border border-white/10 flex items-center justify-center text-amber-400 text-base shrink-0"><i class="fa-solid ${item.icon || 'fa-utensils'}"></i></div>`
+                        }
+                        <div class="min-w-0 flex-1 space-y-0.5">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <h5 class="text-xs sm:text-sm font-bold text-white group-hover:text-amber-300 transition truncate">${item.name}</h5>
+                                ${tagBadge}
+                            </div>
+                            <div class="flex items-center gap-2 text-[11px] text-gray-400">
+                                <span class="bg-white/5 px-2 py-0.5 rounded text-[10px] text-gray-300 font-mono">${categoryLabel}</span>
+                                <span class="text-amber-400 font-mono font-bold">Rs. ${item.price}</span>
+                            </div>
+                            ${item.desc ? `<p class="text-[11px] text-gray-400 line-clamp-1">${item.desc}</p>` : ''}
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
+                        <button type="button" onclick="window.openEditMenuItemModal('${item.id}')" class="bg-amber-500/15 hover:bg-amber-500 text-amber-300 hover:text-black border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold transition shrink-0 active:scale-95 cursor-pointer flex items-center gap-1.5">
+                            <i class="fa-solid fa-pen-to-square text-[11px]"></i>
+                            <span>Edit</span>
+                        </button>
+                        <button type="button" onclick="window.deleteMenuItem('${item.id}')" class="bg-red-600/15 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/20 px-3 py-1.5 rounded-xl text-xs font-semibold transition shrink-0 active:scale-95 cursor-pointer flex items-center gap-1.5">
+                            <i class="fa-solid fa-trash-can text-[11px]"></i>
+                            <span>Del</span>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
             });
+        };
+
+        window.refreshAdminItemsList = function() {
+            const countBadge = document.getElementById('adminTotalItemsCount');
+            const btnCountBadge = document.getElementById('adminMenuBtnCount');
+            const listContainer = document.getElementById('adminItemsList');
+            if (countBadge) countBadge.innerText = `${(window.menuItems || []).length} Dishes`;
+            if (btnCountBadge) btnCountBadge.innerText = `${(window.menuItems || []).length} Dishes`;
+            if (listContainer) listContainer.innerHTML = "";
+            if (typeof window.renderAdminFullMenuList === 'function') {
+                window.renderAdminFullMenuList();
+            }
         };
     
 
